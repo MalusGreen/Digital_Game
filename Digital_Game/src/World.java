@@ -49,8 +49,11 @@ public class World{
 					data=sc.readLine();
 					switch (data.charAt(0)){
 						case 'W':
-							map[u]=new Wall(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+							Wall wall=new Wall(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
 										   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
+							map[u]=wall;
+							obstacles.add(wall);
+							break;
 							break;
 						case 'C':
 							map[u]=new CheckPoint(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
