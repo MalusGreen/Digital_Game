@@ -50,7 +50,7 @@ public class GameFrame extends JFrame implements ActionListener {
 	private JButton play, pause, exit, menuExit, unpause, menubtn, menubtn2,
 			menubtn3, instructions, about;
 	private DefPanel pausePanel, instPanel, aboutPanel;
-	private Game game;
+	public Game game;
 
 	public GameFrame(String title) throws IOException {
 		super(title);

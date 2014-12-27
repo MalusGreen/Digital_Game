@@ -51,11 +51,11 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		addMouseListener(this);
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseMoved(MouseEvent e) {
-				System.out.println(e.getX() + " " + e.getY());
+				System.out.println("Mouse: "+e.getX() + " " + e.getY());
 				for (Bullet i : bullets) {
 					i.setTx(e.getX());
 					i.setTy(e.getY());
-					System.out.println(i.tx + " " + i.ty);
+					System.out.println("Bullets"+i.tx + " " + i.ty);
 				}
 			}
 		});
@@ -91,7 +91,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		}
 		// paint background, type, health for selected bugs
 		for (int i = 0; i < selectedBugs.size(); i++) {
-			g.setColor(Color.WHITE);
+			g.setColor(Color.white);
 			g.fillRect(getWidth() - 189 + i % 2 * 88, getHeight() - 419 + i / 2
 					* 116, 75, 70);
 			g.drawImage(selectedBugs.get(i).getImage(), getWidth() - 176 + i
@@ -119,10 +119,8 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
-		clicked = false;
-
+		
 	}
-
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
@@ -192,25 +190,27 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 				if (shifted) { // shift on, move all bugs
 					for (Bug i : bugs)
 						i.moveTo(mx, my);
-				} else
+				}else
 					// shift off, only move selected bugs
 					for (Bug i : selectedBugs)
 						i.moveTo(mx, my);
 			}
-			for (Unit i : bugs) {
-				i.update();
+			for (Unit i : bugs){
+				if(i instanceof Bug){
+					((Bug)i).update(map);
+				}else{
+					i.update();
+				}
 			}
-			for (Bullet i : bullets) {
+			for (Bullet i : bullets){
 				i.update();
-
 			}
 		}
 
 		if (e.getSource() == combine) {/* combine */
 			System.out.println("combined");
 			int newType = 0;
-			Bug combined = new Bug(selectedBugs.get(0).getX(), selectedBugs
-					.get(0).getY());
+			Bug combined = new Bug(selectedBugs.get(0).getX(), selectedBugs.get(0).getY());
 			while (selectedBugs.size() > 0) {
 				newType += selectedBugs.get(0).getType();
 				bugs.remove(selectedBugs.get(0));
@@ -224,9 +224,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			System.out.println(selectedBugs.size());
 			bugs.add(combined);
 		}
-
+		clicked = false;
 		repaint();
-
 	}
-
 }

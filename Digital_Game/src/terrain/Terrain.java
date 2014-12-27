@@ -1,6 +1,7 @@
 package terrain;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public abstract class Terrain {
 	protected Vector pos;
@@ -13,4 +14,11 @@ public abstract class Terrain {
 		return solid;
 	}
 	public abstract void draw(Graphics g);
+	
+	public Rectangle getRect(){
+		return new Rectangle(pos.getX(),pos.getY(),50,50);
+	}
+	public String toString(){
+		return "Position: "+pos.getX()+" "+pos.getY();
+	}
 }

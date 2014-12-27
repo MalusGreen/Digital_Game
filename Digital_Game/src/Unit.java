@@ -7,7 +7,6 @@ public class Unit {
 	protected double dx, dy; // velocity x & y (has direction)
 	protected int health, damage;
 	protected int speed = 5;
-	protected Rectangle rect = new Rectangle(0, 0, 0, 0);
 	public static int size = 25;
 
 	public Unit(int x, int y) {
@@ -51,11 +50,10 @@ public class Unit {
 			x = size;
 		if (y < size)
 			y = size;
-
 	}
 
 	public void draw(Graphics g) {
-		g.fillOval(x - size, x - size, size * 2, size * 2);
+		g.fillOval(x - size, y - size, size * 2, size * 2);
 	}
 
 	public void stop() {
@@ -67,7 +65,7 @@ public class Unit {
 	}
 
 	public boolean intersects(Unit other) { // check collision with another bug
-		return this.rect.intersects(other.rect);
+		return this.getRect().intersects(other.getRect());
 	}
 
 	public int getX() {
@@ -77,5 +75,7 @@ public class Unit {
 	public int getY() {
 		return y;
 	}
-
+	public Rectangle getRect(){
+		return new Rectangle(x - size, y - size, size * 2, size * 2);
+	}
 }

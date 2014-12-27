@@ -14,7 +14,6 @@ public class Sector {
 	ImageIcon bg;
 	public Sector(String path, int x, int y, int sx, int sy){
 		bg=new ImageIcon(path);
-		System.out.println(path);
 		rect=new Rectangle(x,y,sx,sy);
 	}
 	public void draw(Graphics g){

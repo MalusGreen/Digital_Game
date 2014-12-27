@@ -9,8 +9,9 @@ public class Bullet extends Unit {
 	// constructor
 	public Bullet(int x, int y,int time) {
 		super(x, y);
-		System.out.println(tx+" "+ty);
-		System.out.println(x+" "+y);
+//		System.out.println(tx+" "+ty);
+//		System.out.println(x+" "+y);
+//		System.out.println("Here");
 		this.time=time;
 	}
 	public void setTx(int tx){
@@ -33,7 +34,7 @@ public class Bullet extends Unit {
 	}
 	public void draw(Graphics g){
 		g.setColor(Color.GREEN);
-		g.fillRect(x, y, size, size);
+		g.fillRect(super.x, super.y, size, size);
 	}
 
 	public void setX(int x) {

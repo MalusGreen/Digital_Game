@@ -5,9 +5,9 @@ Sector 1: x1y2sx3sy4
 outer-space.jpg
 4
 W: x100y200
-C: x3y4
+C: x400y400
 W: x500y600
-C: x7y8
+C: x700y800
 --------------------
 Sector 2: x5y6sx7sy8
 nasa-space.jpg

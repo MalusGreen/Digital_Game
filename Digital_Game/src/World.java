@@ -52,8 +52,6 @@ public class World{
 							Wall wall=new Wall(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
 										   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
 							map[u]=wall;
-							obstacles.add(wall);
-							break;
 							break;
 						case 'C':
 							map[u]=new CheckPoint(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
@@ -78,6 +76,10 @@ public class World{
 		if(y==my){
 			y=0;
 		}
+	}
+	
+	public Sector getSect(){
+		return sectors[x][y];
 	}
 //	public static void main(String args[]){
 //		ArrayList<Vector> path=new ArrayList<Vector>();
