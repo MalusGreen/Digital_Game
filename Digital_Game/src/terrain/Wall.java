@@ -2,7 +2,7 @@ package terrain;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Rectangle;
+
 
 public class Wall extends Terrain {
 
@@ -14,8 +14,12 @@ public class Wall extends Terrain {
 	@Override
 	public void draw(Graphics g) {
 		g.setColor(Color.red);
-		g.fillOval(super.pos.getX(), super.pos.getY(), 50, 50);
 
-		g.drawRect(super.pos.getX(), super.pos.getY(), 50, 50);
+		g.fillRect(x-size, y-size, size*2, size*2);
+	}
+
+	@Override
+	public int active() {
+		return 0;
 	}
 }

@@ -7,7 +7,7 @@ outer-space.jpg
 W: x100y200
 C: x400y400
 W: x500y600
-C: x700y800
+T: x600y200
 --------------------
 Sector 2: x5y6sx7sy8
 nasa-space.jpg

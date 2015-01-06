@@ -4,16 +4,13 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-import terrain.Terrain;
-import terrain.Wall;
-
+import terrain.*;
 public class Bug extends Unit {
 	private int type;
 	private Image timg;
 	public boolean selected;
 	public Bullet bullet;
 	protected int health, damage;
-
 	public Bug(int x, int y) {
 		super(x, y);
 		type = 1;
@@ -82,12 +79,30 @@ public class Bug extends Unit {
 	
 	public void update(World map) { // collision rect
 		
-		for (Terrain i : map.getSect().map){
+		for (Terrain i : map.getSect().getMap()){
 			if (i.getSolid()&&super.getRect().intersects(i.getRect())) {
+				if(this.x>=i.getX())
+					x=i.getX()+i.getSize()+1;
+				else if(this.x<i.getX())
+					x=i.getX()-i.getSize()-1;
+				if(this.y>=i.getY())
+					this.y=i.getY()+i.getSize()+1;
+				else if(this.y<i.getY())
+					y=i.getY()-i.getSize()-1;
 				tx=x;
 				ty=y;
 			}
 			else{
+				if(!i.getSolid()&&super.getRect().intersects(i.getRect())){
+					int active=i.active();
+					switch(active){
+						case 0:
+							break;
+						case 1:
+							//Check point captured. Show's the captured point.
+							
+					}
+				}
 				super.update();
 			}
 		}

@@ -57,6 +57,9 @@ public class World{
 							map[u]=new CheckPoint(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
 										   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
 							break;
+						case 'T':
+							map[u]=new Teleporter(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+									   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
 					}
 				}
 				sectors[i][j].setMap(map);
