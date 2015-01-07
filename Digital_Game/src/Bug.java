@@ -100,7 +100,8 @@ public class Bug extends Unit {
 							break;
 						case 1:
 							//Check point captured. Show's the captured point.
-							
+							System.out.println("Wow, I did it!");
+							break;
 					}
 				}
 				super.update();
