@@ -23,14 +23,10 @@ public class CheckPoint extends Terrain{
 
 	@Override
 	public int active() {
+		count++;
 		if(count==100){
-			count++;
+			capt=true;
 			return 1;
-		}else{
-			count++;
-			if(count==100){
-				capt=true;
-			}
 		}
 		return 0;
 		

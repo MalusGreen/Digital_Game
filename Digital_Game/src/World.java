@@ -7,14 +7,14 @@ import terrain.*;
 
 public class World{
 	private int mx, my;
-	private int x,y;
+	private int level;
 	private int tx,ty;
 	private int cx,cy;
-	Sector[][] sectors;
+	Sector[] sectors;
 	final int[] A={0,-1,1,0};
 	final int[] B={-1,0,0,1};
 	public World(){
-		x=0;y=0;
+		level=0;
 		
 		tx=0;ty=0;
 		
@@ -23,7 +23,7 @@ public class World{
 		mx=10;my=10;
 	}
 	public World(String path) throws IOException{
-		x=0;y=0;
+		level=0;
 		tx=0;ty=0;
 		cx=0;cy=0;
 		mx=0;my=0;
@@ -33,59 +33,52 @@ public class World{
 	public void readFile(String path) throws IOException{
 		@SuppressWarnings("resource")
 		BufferedReader sc=new BufferedReader(new FileReader(path));
-		sectors=new Sector[Integer.parseInt(sc.readLine())][Integer.parseInt(sc.readLine())];
+		sectors=new Sector[Integer.parseInt(sc.readLine())];
 		String data;
 		my=sectors.length;
-		mx=sectors[0].length;
 		for(int i=0;i<sectors.length;i++){
-			for(int j=0;j<sectors[i].length;j++){
-				sc.readLine();
+			sc.readLine();
+			data=sc.readLine();
+			sectors[i]=new Sector(sc.readLine(),Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+									,Integer.parseInt(data.substring(data.indexOf("y")+1,data.indexOf("sx")))
+									,Integer.parseInt(data.substring(data.indexOf("sx")+2,data.indexOf("sy")))
+									,Integer.parseInt(data.substring(data.indexOf("sy")+2)));
+			Terrain[] map=new Terrain[Integer.parseInt(sc.readLine())];
+			for(int u=0;u<map.length;u++){
 				data=sc.readLine();
-				sectors[i][j]=new Sector(sc.readLine(),Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
-										,Integer.parseInt(data.substring(data.indexOf("y")+1,data.indexOf("sx")))
-										,Integer.parseInt(data.substring(data.indexOf("sx")+2,data.indexOf("sy")))
-										,Integer.parseInt(data.substring(data.indexOf("sy")+2)));
-				Terrain[] map=new Terrain[Integer.parseInt(sc.readLine())];
-				for(int u=0;u<map.length;u++){
-					data=sc.readLine();
-					switch (data.charAt(0)){
-						case 'W':
-							Wall wall=new Wall(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
-										   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
-							map[u]=wall;
-							break;
-						case 'C':
-							map[u]=new CheckPoint(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
-										   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
-							break;
-						case 'T':
-							map[u]=new Teleporter(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+				switch (data.charAt(0)){
+					case 'W':
+						Wall wall=new Wall(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
 									   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
-					}
+						map[u]=wall;
+						break;
+					case 'C':
+						map[u]=new CheckPoint(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+									   ,Integer.parseInt(data.substring(data.indexOf("y")+1)));
+						break;
+					case 't':
+						map[u]=new Teleporter(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+								   ,Integer.parseInt(data.substring(data.indexOf("y")+1)),1);
+						break;
+					case 'T':
+						map[u]=new Teleporter(Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
+								   ,Integer.parseInt(data.substring(data.indexOf("y")+1)),0);
+						break;
 				}
-				sectors[i][j].setMap(map);
 			}
+			sectors[i].setMap(map);
 		}
 	}
 	public void draw(Graphics g){
 		tx+=cx;
 		ty+=cy;
-		sectors[y][x].draw(g,tx,ty);
+		sectors[level].draw(g,tx,ty);
 	}
-	
-	public void change(){
-		x++;
-		if(x==mx){
-			x=0;
-			y++;
-		}
-		if(y==my){
-			y=0;
-		}
+	public void change(int c){
+		level+=c;
 	}
-	
 	public Sector getSect(){
-		return sectors[x][y];
+		return sectors[level];
 	}
 	public void setX(int a){
 		cx=a;

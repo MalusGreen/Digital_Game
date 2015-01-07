@@ -78,7 +78,6 @@ public class Bug extends Unit {
 	}
 	
 	public void update(World map) { // collision rect
-		
 		for (Terrain i : map.getSect().getMap()){
 			if (i.getSolid()&&super.getRect().intersects(i.getRect())) {
 				if(this.x>=i.getX())
@@ -101,6 +100,14 @@ public class Bug extends Unit {
 						case 1:
 							//Check point captured. Show's the captured point.
 							System.out.println("Wow, I did it!");
+							break;
+						case 2:
+							System.out.println("Activating Teleporter!(Down)");
+							map.change(1);
+							break;
+						case 3:
+							System.out.println("Activating Teleporter!(Up)");
+							map.change(-1);
 							break;
 					}
 				}

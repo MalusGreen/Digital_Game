@@ -47,7 +47,7 @@ public class GUI extends JFrame implements ActionListener, MouseListener{
 	
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		map.change();
+		map.change(1);
 		repaint();
 	}
 	@Override

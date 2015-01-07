@@ -1,4 +1,3 @@
-1
 3
 --------------------
 Sector 1: x1y2sx3sy4
@@ -11,13 +10,15 @@ T: x600y200
 --------------------
 Sector 2: x5y6sx7sy8
 nasa-space.jpg
-3
+4
 W: x150y500
 C: x10y10
-C: x500y500
+T: x500y500
+t: x600y300
 --------------------
 Sector 3: x1y2sx3sy4
 Orange-space.jpg
-2
-W: x100y100
+3
+t: x300y210
 C: x500y500
+W: x109y400
