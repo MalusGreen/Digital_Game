@@ -16,34 +16,47 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class Game extends JPanel implements ActionListener, KeyListener,
-		MouseListener {
+public class Game extends JPanel implements ActionListener, KeyListener,MouseListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private Timer timer;
-	public static ArrayList<Bug> bugs = new ArrayList<>();
+	private static ArrayList<Bug> bugs = new ArrayList<>();
 	private ArrayList<Unit> enemies = new ArrayList<>();
 	private ArrayList<Bug> selectedBugs = new ArrayList<>();
-	public static boolean clicked, shifted;
 	public static ArrayList<Bullet> bullets = new ArrayList<>();
+	
+
+	private static boolean clicked, shifted;
 	private int mx, my;
-	public static World map;
+	private static World map;
 	public JButton pause, exit, combine;
 
 	public Game() throws IOException {
 		timer = new Timer(17, this);
 		timer.start();
+		
 		addKeyListener(this);
 		addBugs(bugs);
 		addEnemies(enemies);
+		
 		map = new World("test.txt");
+		
 		setLayout(null);
+		
 		combine = new PrettyBtn("COMBINE", 2);
 		pause = new PrettyBtn("PAUSE", 2);
 		exit = new PrettyBtn("MENU", 2);
+		
 		selectedBugs.add((Bug) bugs.get(bugs.size() - 1));
 		selectedBugs.get(0).selected = true;
+		
 		add(combine);
 		add(pause);
 		add(exit);
+		
 		combine.addActionListener(this);
 		combine.addKeyListener(this);
 		pause.addKeyListener(this);
@@ -51,11 +64,9 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		addMouseListener(this);
 		addMouseMotionListener(new MouseMotionAdapter() {
 			public void mouseMoved(MouseEvent e) {
-				System.out.println("Mouse: "+e.getX() + " " + e.getY());
 				for (Bullet i : bullets) {
 					i.setTx(e.getX());
 					i.setTy(e.getY());
-					System.out.println("Bullets"+i.tx + " " + i.ty);
 				}
 			}
 		});
@@ -173,13 +184,38 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 				}
 			}
 		}
+		if(e.getKeyCode() == KeyEvent.VK_W){
+			map.setY(-1);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_S){
+			map.setY(1);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_A){
+			map.setX(-1);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_D){
+			map.setX(1);
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getKeyCode() == 16)// shift
+		if (e.getKeyCode() == 16){// shift
 			shifted = false;
+		}
+		if(e.getKeyCode() == KeyEvent.VK_W){
+			map.setY(0);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_S){
+			map.setY(0);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_A){
+			map.setX(0);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_D){
+			map.setX(0);
+		}
 	}
 
 	@Override
@@ -228,3 +264,4 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		repaint();
 	}
 }
+

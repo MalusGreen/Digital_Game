@@ -6,27 +6,28 @@ import terrain.*;
 
 
 public class World{
-	int mx, my;
-	int x=0,y=0;
-	String data;
+	private int mx, my;
+	private int x,y;
+	private int tx,ty;
+	private int cx,cy;
 	Sector[][] sectors;
 	final int[] A={0,-1,1,0};
 	final int[] B={-1,0,0,1};
 	public World(){
-		mx=10;
-		my=10;
-		data= "O O O O OO"
-			 +"O O O O OO"
-			 +"O O O O OO"
-			 +"OOOOO OOOO"
-			 +"O        O"
-			 +"OOOOOO   O"
-			 +"O        O"
-			 +"OOOOOOOO O"
-			 +"OO   O O O"
-			 +"OOOO   OOO";
+		x=0;y=0;
+		
+		tx=0;ty=0;
+		
+		cx=0;cy=0;
+		
+		mx=10;my=10;
 	}
 	public World(String path) throws IOException{
+		x=0;y=0;
+		tx=0;ty=0;
+		cx=0;cy=0;
+		mx=0;my=0;
+		
 		readFile(path);
 	}
 	public void readFile(String path) throws IOException{
@@ -67,7 +68,9 @@ public class World{
 		}
 	}
 	public void draw(Graphics g){
-		sectors[y][x].draw(g);
+		tx+=cx;
+		ty+=cy;
+		sectors[y][x].draw(g,tx,ty);
 	}
 	
 	public void change(){
@@ -84,6 +87,20 @@ public class World{
 	public Sector getSect(){
 		return sectors[x][y];
 	}
+	public void setX(int a){
+		cx=a;
+//		if(tx<0){
+//			tx=0;
+//		}
+	}
+	
+	public void setY(int a){
+		cy=a;
+//		if(ty<0){
+//			ty=0;
+//		}
+	}
+	
 //	public static void main(String args[]){
 //		ArrayList<Vector> path=new ArrayList<Vector>();
 //		World test=new World();

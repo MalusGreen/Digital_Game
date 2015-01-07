@@ -17,10 +17,10 @@ public class Sector {
 		System.out.println(path);
 		rect=new Rectangle(x,y,sx,sy);
 	}
-	public void draw(Graphics g){
+	public void draw(Graphics g, int x, int y){
 		g.drawImage(bg.getImage(), 0, 0, null);
 		for(int i=0;i<map.length;i++){
-			map[i].draw(g);
+			map[i].draw(g, x, y);
 		}
 	}
 	public Rectangle getRect(){

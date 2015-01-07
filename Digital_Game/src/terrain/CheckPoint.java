@@ -14,10 +14,10 @@ public class CheckPoint extends Terrain{
 	}
 
 	@Override
-	public void draw(Graphics g) {
+	public void draw(Graphics g, int x, int y) {
 		if(!capt){
 			g.setColor(Color.blue);
-			g.fillRect(x-size, y-size, size*2, size*2);
+			g.fillRect(this.x-size-x, this.y-size-y, size*2, size*2);
 		}
 	}
 

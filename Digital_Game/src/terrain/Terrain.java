@@ -16,7 +16,7 @@ public abstract class Terrain {
 	public boolean getSolid(){
 		return solid;
 	}
-	public abstract void draw(Graphics g);
+	public abstract void draw(Graphics g, int x, int y);
 	
 	public Rectangle getRect(){
 		return new Rectangle(getX()-size,getY()-size,size*2,size*2);
