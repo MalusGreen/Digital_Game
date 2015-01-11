@@ -6,15 +6,16 @@ import java.util.ArrayList;
 import javax.swing.*;
 
 public class Game extends JPanel implements ActionListener, KeyListener,
-		MouseListener {
+		MouseListener, MouseMotionListener {
 	private Timer timer;
-	public static ArrayList<Unit> bugs = new ArrayList<>();
+	public static ArrayList<Bug> bugs = new ArrayList<>();
 	public static ArrayList<Unit> enemies = new ArrayList<>();
 	private ArrayList<Bug> selectedBugs = new ArrayList<>();
-	public static boolean clicked, shifted;
+	public static boolean left_clicked, right_clicked, shifted;
 	public static ArrayList<Bullet> bullets = new ArrayList<>();
 	public static ArrayList<Bullet> enemyBullets = new ArrayList<>();
-	private int mx, my;
+	private int mx, my; //Movement
+	private Rectangle dragBox; //Selection
 	public static World map;
 	public static int score;
 	public static int click_count;
@@ -24,10 +25,13 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 
 	public Game() throws IOException {
 		click_count=0;
+		right_clicked=false;
+		left_clicked=false;
+		dragBox=new Rectangle();
 		
 		addKeyListener(this);
-		addBugs(bugs);
-		addEnemies(enemies);
+		addBugs();
+		addEnemies();
 		
 		map = new World("test.txt");
 		setLayout(null);
@@ -50,25 +54,23 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		pause.addKeyListener(this);
 		exit.addKeyListener(this);
 		addMouseListener(this);
-
-		setBackground(Color.WHITE);
+		addMouseMotionListener(this);
+		
+		setBackground(Color.white);
 	}
 
-	public void addBugs(ArrayList<Unit> arr) {
+	public void addBugs() {
 		for (int i = 0; i < 5; i++) {
 			bugs.add(new Bug((int) (i/10.0 * 100) + 12, (int) (i/10.0 * 100) + 12));
 		}
 	}
 
-	public void addEnemies(ArrayList<Unit> arr) {
+	public void addEnemies() {
 		enemies.add(new Enemy(300, 300, 5));
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
-		//Shows where user clicks.
-		clicked(g);
 		
 		//map
 		map.draw(g);
@@ -106,27 +108,73 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			g.drawString(selectedBugs.get(i).getType() + "", getWidth() - 129
 					+ i % 2 * 88, getHeight() - 322 + i / 2 * 115);
 		}
+		
+		//Shows where user clicks.
+		clicked(g);
+		//Shows the box the user creates with left mouse click.
+		dragBox(g);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 	}
-
+	
 	@Override
-	public void mousePressed(MouseEvent e) {
-		
+	public void mouseDragged(MouseEvent e) {
+		if(SwingUtilities.isLeftMouseButton(e)){
+			if (e.getX() < 780){
+				dragBox.width=(e.getX()+map.getX())-dragBox.x;
+				dragBox.height=(e.getY()+map.getY())-dragBox.y;
+			}
+		}
+		else if(SwingUtilities.isRightMouseButton(e)){ // ensure player is clicking on game panel
+			click_count=10;
+			if(e.getX()<780){
+				mx = e.getX() + map.getX();//Accounts for map scrolling displacement
+				my = e.getY() + map.getY();
+			}
+		}
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {
-		if(SwingUtilities.isRightMouseButton(e)){
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if(SwingUtilities.isLeftMouseButton(e)){
+			if (e.getX() < 780){
+				left_clicked = true;
+				dragBox.x=e.getX()+map.getX();
+				dragBox.y=e.getY()+map.getY();
+			}
+		}
+		else if(SwingUtilities.isRightMouseButton(e)){
 			if (e.getX() < 780) { // ensure player is clicking on game panel
-				clicked = true;
+				right_clicked = true;
 				click_count=10;
 				mx = e.getX() + map.getX();//Accounts for map scrolling displacement
 				my = e.getY() + map.getY();
 			}
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		if(SwingUtilities.isLeftMouseButton(e)){
+			left_clicked = false;
+			dragBox.width=1;
+			dragBox.height=1;
+		}
+		else if(SwingUtilities.isRightMouseButton(e)){ // ensure player is clicking on game panel
+			right_clicked = false;
+			click_count=10;
+//			if(e.getX()<780){
+//				mx = e.getX() + map.getX();//Accounts for map scrolling displacement
+//				my = e.getY() + map.getY();
+//			}
 		}
 	}
 
@@ -223,18 +271,38 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getSource() == timer) {
-			if (clicked) {
+			if (right_clicked) {
 				int size = 0;
 				int bug_size=0;
 				if (shifted) { // shift on, move all bugs
 					for (Unit i : bugs)
 						((Bug) i).moveTo(mx, my);
-				} else
+				}else{
 					// shift off, only move selected bugs
-					size=(int)Math.sqrt(selectedBugs.size());
-					bug_size=bugs.get(0).size;
-					for (int i=0;i<selectedBugs.size();i++)
+					
+					if(selectedBugs.size()==1){
+						selectedBugs.get(0).moveTo(mx,my);
+					}
+					else {
+						size=(int)Math.sqrt(selectedBugs.size());
+						bug_size=bugs.get(0).size;
+						for (int i=0;i<selectedBugs.size();i++){
 						selectedBugs.get(i).moveTo(mx+i%size*bug_size*2-size*bug_size, my+i*bug_size*2/size-size*bug_size);
+						}
+					}
+				}
+			}
+			if(left_clicked){
+				selectedBugs.clear();
+				Rectangle rect=normalize(dragBox);
+				
+				for(Bug i: bugs){
+					i.selected=false;
+					if(i.getCollision().intersects(rect)){
+						selectedBugs.add(i);
+						i.selected=true;
+					}
+				}
 			}
 			for (Unit i : bugs) {
 				((Bug) i).update(map);
@@ -278,12 +346,34 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			bugs.add(combined);
 		}
 		repaint();
-		clicked = false;
 	}
 	public void clicked(Graphics g){
+		if(click_count<1){
+			return;
+		}
 		g.setColor(Color.blue);
 		g.fillOval(mx-click_count/2,my-click_count/2,click_count,click_count);
 		click_count--;
+		
+	}
+	public void dragBox(Graphics g){
+		if(!left_clicked){
+			return;
+		}
+		g.setColor(new Color(0,255,0,25));
+		g.fillRect(dragBox.x,dragBox.y,dragBox.width,dragBox.height);
+	}
+	public Rectangle normalize(Rectangle dragBox){
+		Rectangle rect=new Rectangle(dragBox);
+		if(dragBox.width<0){
+			rect.x+=dragBox.width;
+			rect.width*=-1;
+		}
+		if(dragBox.height<0){
+			rect.y+=dragBox.height;
+			rect.height*=-1;
+		}
+		return rect;
 	}
 	public Timer getTimer() {
 		return timer;
@@ -294,9 +384,11 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		enemies.clear();
 		bullets.clear();
 		enemyBullets.clear();
-		addBugs(bugs);
-		addEnemies(enemies);
+		addBugs();
+		addEnemies();
 		selectedBugs.add((Bug) bugs.get(0));
 		selectedBugs.get(0).selected = true;
 	}
+
+	
 }

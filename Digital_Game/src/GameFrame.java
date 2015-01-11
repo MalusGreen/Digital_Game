@@ -55,6 +55,7 @@ public class GameFrame extends JFrame implements ActionListener {
 
 	public GameFrame(String title) throws IOException {
 		super(title);
+		
 		c = this.getContentPane();
 		cards = new CardLayout();
 		c.setLayout(cards);
@@ -137,7 +138,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		GameFrame frame = new GameFrame("Source Code");
 		frame.setSize(1000, 700);
 		frame.setVisible(true);
-		frame.setResizable(true);
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 }
