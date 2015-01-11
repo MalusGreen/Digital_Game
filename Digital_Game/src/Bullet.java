@@ -2,39 +2,68 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Bullet extends Unit {
-	private int x, y; // x,y 
 	private static int size = 5; // width and height
-	private int time;
+	private int time, damage;
+	public String type;
 
 	// constructor
-	public Bullet(int x, int y,int time) {
-		super(x, y);
-//		System.out.println(tx+" "+ty);
-//		System.out.println(x+" "+y);
-//		System.out.println("Here");
-		this.time=time;
+	public Bullet(int x, int y, int time, int damage, String type) {
+		super(x, y, size);
+		this.damage = damage;
+		this.time = time;
+		this.type = type;
 	}
-	public void setTx(int tx){
-		this.tx=tx;
+
+	public void moveTo(int tx, int ty) {
+		if (reached) {
+			this.tx = tx;
+			this.ty = ty;
+		}
 	}
-	public void setTy(int ty){
-		this.ty=ty;
+
+	public void update() {
+		time--;
+		if (x >= 770 || y >= 675 || x <= 5 || y <= 5 || time == 0) {
+			if (type.equals("bug")) {
+				Game.bullets.remove(this);
+			} else {
+				Game.enemyBullets.remove(this);
+			}
+		} else {
+			super.update();
+			checkCollision();
+		}
 	}
-	public void update(){
-		super.update();
-	}
+
 	// returning all the necessary value of this class
 
 	public int getX() {
 		return x;
 	}
-	
+
 	public int getY() {
 		return y;
 	}
-	public void draw(Graphics g){
-		g.setColor(Color.GREEN);
-		g.fillRect(super.x, super.y, size, size);
+
+	public int getDamage() {
+		return damage;
+	}
+
+	public void draw(Graphics g) {
+		switch (damage) {
+		case 2:
+			g.setColor(Color.BLUE);
+			break;
+		case 4:
+			g.setColor(Color.GREEN);
+			break;
+		case 6:
+			g.setColor(Color.RED);
+			break;
+		}
+		g.drawRect(getCollision().x - cx, getCollision().y - cy, getCollision().width,
+				getCollision().height);
+		g.fillRect(super.x - 5 - cx, super.y - 5 - cy, size * 2, size * 2);
 	}
 
 	public void setX(int x) {
@@ -45,7 +74,35 @@ public class Bullet extends Unit {
 		this.y = y;
 	}
 
-	// move toward the angle
-	// //forward
+	private void checkCollision() {
+		if (type.equals("bug")) {
+			for (int i = 0; i < Game.enemies.size(); i++) {
+				Enemy curr = (Enemy) Game.enemies.get(i);
+				if (curr.getCollision().intersects(getCollision())) {
+					if (((Enemy) curr).health > 0) {
+						((Enemy) curr).health -= 1;
+					}
+					if (((Enemy) curr).health <= 0) {
+						Game.score += 5;
+						Game.enemies.remove(i);
+					}
+					Game.bullets.remove(this);
+				}
+			}
+		} else {
+			for (int i = 0; i < Game.bugs.size(); i++) {
+				Unit curr = Game.bugs.get(i);
+				if (getCollision().intersects(curr.getCollision())) {
+					System.out.println("intersect");
+					((Bug) curr).health -= 1;
+				}
+				if (((Bug) curr).health <= 0) {
+					Game.score += 5;
+					Game.bugs.remove(i);
+				}
+				Game.bullets.remove(this);
+			}
+		}
+	}
 
 }

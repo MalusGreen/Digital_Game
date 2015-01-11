@@ -16,7 +16,7 @@ public class Teleporter extends Terrain{
 
 	@Override
 	public void draw(Graphics g, int x, int y) {
-		g.setColor(new Color(255*to,255-(int)255.0*count/100,0));
+		g.setColor(new Color(255*to,255-255*count/100,0));
 		g.fillRect(this.x-size-x, this.y-size-y, size*2, size*2);
 	}
 	@Override

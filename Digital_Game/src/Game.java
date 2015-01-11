@@ -1,54 +1,42 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.swing.*;
 
-public class Game extends JPanel implements ActionListener, KeyListener,MouseListener {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	
+public class Game extends JPanel implements ActionListener, KeyListener,
+		MouseListener {
 	private Timer timer;
-	private static ArrayList<Bug> bugs = new ArrayList<>();
-	private ArrayList<Unit> enemies = new ArrayList<>();
+	public static ArrayList<Unit> bugs = new ArrayList<>();
+	public static ArrayList<Unit> enemies = new ArrayList<>();
 	private ArrayList<Bug> selectedBugs = new ArrayList<>();
+	public static boolean clicked, shifted;
 	public static ArrayList<Bullet> bullets = new ArrayList<>();
-	
-
-	private static boolean clicked, shifted;
+	public static ArrayList<Bullet> enemyBullets = new ArrayList<>();
 	private int mx, my;
-	private static World map;
+	public static World map;
+	public static int score;
+	public static int click_count;
 	public JButton pause, exit, combine;
+	PointerInfo a = MouseInfo.getPointerInfo();
+	Point b = a.getLocation();
 
 	public Game() throws IOException {
-		timer = new Timer(17, this);
-		timer.start();
+		click_count=0;
 		
 		addKeyListener(this);
 		addBugs(bugs);
 		addEnemies(enemies);
 		
 		map = new World("test.txt");
-		
 		setLayout(null);
+		
 		
 		combine = new PrettyBtn("COMBINE", 2);
 		pause = new PrettyBtn("PAUSE", 2);
 		exit = new PrettyBtn("MENU", 2);
+		timer = new Timer(17, this);
 		
 		selectedBugs.add((Bug) bugs.get(bugs.size() - 1));
 		selectedBugs.get(0).selected = true;
@@ -62,42 +50,49 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 		pause.addKeyListener(this);
 		exit.addKeyListener(this);
 		addMouseListener(this);
-		addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseMoved(MouseEvent e) {
-				for (Bullet i : bullets) {
-					i.setTx(e.getX());
-					i.setTy(e.getY());
-				}
-			}
-		});
+
 		setBackground(Color.WHITE);
 	}
 
-	public void addBugs(ArrayList<Bug> arr) {
+	public void addBugs(ArrayList<Unit> arr) {
 		for (int i = 0; i < 5; i++) {
-			bugs.add(new Bug((int) (Math.random() * 100) + 12, (int) (Math
-					.random() * 100) + 12));
+			bugs.add(new Bug((int) (i/10.0 * 100) + 12, (int) (i/10.0 * 100) + 12));
 		}
 	}
 
 	public void addEnemies(ArrayList<Unit> arr) {
-
+		enemies.add(new Enemy(300, 300, 5));
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
+		//Shows where user clicks.
+		clicked(g);
+		
+		//map
 		map.draw(g);
+		
+		//SideBar- Commands
 		Image sm = new ImageIcon("side-menu.png").getImage();
 		g.drawImage(sm, getWidth() - 220, 0, 220, getHeight(), null);
-		// sm.setBounds(getWidth() - 220, 0, 220, getHeight());
 		combine.setBounds(getWidth() - 190, getHeight() - 190, 170, 30);
 		pause.setBounds(getWidth() - 190, getHeight() - 130, 170, 30);
 		exit.setBounds(getWidth() - 190, getHeight() - 90, 170, 30);
-
+		Unit.setXY(map.getX(), map.getY());
+		
+		//Units
 		for (Unit i : bugs) {
 			i.draw(g);
 		}
 		for (Bullet i : bullets) {
+			i.draw(g);
+		}
+		for (Bullet i : enemyBullets) {
+			i.draw(g);
+		}
+
+		for (Unit i : enemies) {
 			i.draw(g);
 		}
 		// paint background, type, health for selected bugs
@@ -106,8 +101,8 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 			g.fillRect(getWidth() - 189 + i % 2 * 88, getHeight() - 419 + i / 2
 					* 116, 75, 70);
 			g.drawImage(selectedBugs.get(i).getImage(), getWidth() - 176 + i
-					% 2 * 88, getHeight() - 409 + i / 2 * 116, Unit.size * 2,
-					Unit.size * 2, null);
+					% 2 * 88, getHeight() - 409 + i / 2 * 116, Bug.size * 2,
+					Bug.size * 2, null);
 			g.drawString(selectedBugs.get(i).getType() + "", getWidth() - 129
 					+ i % 2 * 88, getHeight() - 322 + i / 2 * 115);
 		}
@@ -120,18 +115,21 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		if (e.getX() < 780) { // ensure player is clicking on game panel
-			clicked = true;
-			mx = e.getX();
-			my = e.getY();
-		}
+		
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+		if(SwingUtilities.isRightMouseButton(e)){
+			if (e.getX() < 780) { // ensure player is clicking on game panel
+				clicked = true;
+				click_count=10;
+				mx = e.getX() + map.getX();//Accounts for map scrolling displacement
+				my = e.getY() + map.getY();
+			}
+		}
 	}
+
 	@Override
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
@@ -146,8 +144,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
@@ -155,23 +152,27 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 		// TODO Auto-generated method stub
 		System.out.println("yes");
 		if (e.getKeyCode() == 38) {// up arrow
-			if (selectedBugs.size() < 4) {
-				Bug newSelected = (Bug) bugs.get(bugs.indexOf(selectedBugs
+			Bug newSelected = null;
+			if (selectedBugs.size() == 0) {
+				newSelected = (Bug) bugs.get(0);
+
+			} else if (selectedBugs.size() < 4) {
+				newSelected = (Bug) bugs.get(bugs.indexOf(selectedBugs
 						.get(selectedBugs.size() - 1)) - 1);
-				selectedBugs.add(newSelected);
-				newSelected.selected = true;
 			}
+			selectedBugs.add(newSelected);
+			newSelected.selected = true;
 		}
-		if (e.getKeyCode() == 40) {// down arrow
+		else if (e.getKeyCode() == 40) {// down arrow
 			if (selectedBugs.size() > 1) {
 				Bug unSelected = selectedBugs.get(selectedBugs.size() - 1);
 				unSelected.selected = false;
 				selectedBugs.remove(unSelected);
 			}
 		}
-		if (e.getKeyCode() == 16)// shift
+		else if (e.getKeyCode() == 16)// shift
 			shifted = true;
-		if (e.getKeyCode() == 32) { // space
+		else if (e.getKeyCode() == 32) { // space
 			System.out.println("space");
 			if (shifted) {
 				for (Unit i : bugs) {
@@ -184,37 +185,37 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 				}
 			}
 		}
-		if(e.getKeyCode() == KeyEvent.VK_W){
-			map.setY(-1);
+		else if(e.getKeyCode() == KeyEvent.VK_W){
+			map.setY(-10);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_S){
-			map.setY(1);
+		else if(e.getKeyCode() == KeyEvent.VK_S){
+			map.setY(10);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_A){
-			map.setX(-1);
+		else if(e.getKeyCode() == KeyEvent.VK_A){
+			map.setX(-10);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_D){
-			map.setX(1);
+		else if(e.getKeyCode() == KeyEvent.VK_D){
+			map.setX(10);
 		}
+	
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getKeyCode() == 16){// shift
+		if (e.getKeyCode() == 16)// shift
 			shifted = false;
+		else if(e.getKeyCode() == KeyEvent.VK_W){
+			map.setY(10);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_W){
-			map.setY(0);
+		else if(e.getKeyCode() == KeyEvent.VK_S){
+			map.setY(-10);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_S){
-			map.setY(0);
+		else if(e.getKeyCode() == KeyEvent.VK_A){
+			map.setX(10);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_A){
-			map.setX(0);
-		}
-		if(e.getKeyCode() == KeyEvent.VK_D){
-			map.setX(0);
+		else if(e.getKeyCode() == KeyEvent.VK_D){
+			map.setX(-10);
 		}
 	}
 
@@ -223,30 +224,46 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 		// TODO Auto-generated method stub
 		if (e.getSource() == timer) {
 			if (clicked) {
+				int size = 0;
+				int bug_size=0;
 				if (shifted) { // shift on, move all bugs
-					for (Bug i : bugs)
-						i.moveTo(mx, my);
-				}else
+					for (Unit i : bugs)
+						((Bug) i).moveTo(mx, my);
+				} else
 					// shift off, only move selected bugs
-					for (Bug i : selectedBugs)
-						i.moveTo(mx, my);
+					size=(int)Math.sqrt(selectedBugs.size());
+					bug_size=bugs.get(0).size;
+					for (int i=0;i<selectedBugs.size();i++)
+						selectedBugs.get(i).moveTo(mx+i%size*bug_size*2-size*bug_size, my+i*bug_size*2/size-size*bug_size);
 			}
-			for (Unit i : bugs){
-				if(i instanceof Bug){
-					((Bug)i).update(map);
-				}else{
-					i.update();
-				}
+			for (Unit i : bugs) {
+				((Bug) i).update(map);
 			}
-			for (Bullet i : bullets){
+			for (Unit i : enemies) {
 				i.update();
+			}
+			for (int i = 0; i < selectedBugs.size(); i++) {
+				if (!bugs.contains(selectedBugs.get(i)))
+					selectedBugs.remove(selectedBugs.get(i));
+			}
+			for (int i = 0; i < bullets.size(); i++) {
+				bullets.get(i).update();
+			}
+			for (int i = 0; i < enemyBullets.size(); i++) {
+				enemyBullets.get(i).update();
+			}
+			Point p = MouseInfo.getPointerInfo().getLocation();
+
+			for (Bullet i : bullets) {
+				i.moveTo((int) p.getX(), (int) p.getY() - 50);
 			}
 		}
 
 		if (e.getSource() == combine) {/* combine */
 			System.out.println("combined");
 			int newType = 0;
-			Bug combined = new Bug(selectedBugs.get(0).getX(), selectedBugs.get(0).getY());
+			Bug combined = new Bug(selectedBugs.get(0).getX(), selectedBugs
+					.get(0).getY());
 			while (selectedBugs.size() > 0) {
 				newType += selectedBugs.get(0).getType();
 				bugs.remove(selectedBugs.get(0));
@@ -260,8 +277,26 @@ public class Game extends JPanel implements ActionListener, KeyListener,MouseLis
 			System.out.println(selectedBugs.size());
 			bugs.add(combined);
 		}
-		clicked = false;
 		repaint();
+		clicked = false;
+	}
+	public void clicked(Graphics g){
+		g.setColor(Color.blue);
+		g.fillOval(mx-click_count/2,my-click_count/2,click_count,click_count);
+		click_count--;
+	}
+	public Timer getTimer() {
+		return timer;
+	}
+	public void reset(){
+		bugs.clear();
+		selectedBugs.clear();
+		enemies.clear();
+		bullets.clear();
+		enemyBullets.clear();
+		addBugs(bugs);
+		addEnemies(enemies);
+		selectedBugs.add((Bug) bugs.get(0));
+		selectedBugs.get(0).selected = true;
 	}
 }
-

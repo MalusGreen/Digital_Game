@@ -18,7 +18,7 @@ public abstract class Terrain {
 	}
 	public abstract void draw(Graphics g, int x, int y);
 	
-	public Rectangle getRect(){
+	public Rectangle getCollision(){
 		return new Rectangle(getX()-size,getY()-size,size*2,size*2);
 	}
 	public String toString(){

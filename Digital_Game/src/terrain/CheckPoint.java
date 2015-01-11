@@ -16,7 +16,7 @@ public class CheckPoint extends Terrain{
 	@Override
 	public void draw(Graphics g, int x, int y) {
 		if(!capt){
-			g.setColor(new Color(0,0,255-(int)255.0*count/100));
+			g.setColor(new Color(0,0,255-255*count/100));
 			g.fillRect(this.x-size-x, this.y-size-y, size*2, size*2);
 		}
 	}

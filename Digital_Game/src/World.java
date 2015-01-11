@@ -6,13 +6,14 @@ import terrain.*;
 
 
 public class World{
-	private int mx, my;
-	private int level;
-	private int tx,ty;
-	private int cx,cy;
-	Sector[] sectors;
-	final int[] A={0,-1,1,0};
+	private int mx, my;//Maxsize of world... obesolete? 
+	private int level;//Level of map
+	private int tx,ty;//Map scrolling displacement
+	private int cx,cy;//Change in map scrolling, when WASD is pressed the map will scroll in target direction
+	Sector[] sectors;//Sectors in the map
+	final int[] A={0,-1,1,0};//Just for convience, obesolete?
 	final int[] B={-1,0,0,1};
+	
 	public World(){
 		level=0;
 		
@@ -72,6 +73,12 @@ public class World{
 	public void draw(Graphics g){
 		tx+=cx;
 		ty+=cy;
+		if(tx<0){
+			tx=0;
+		}
+		if(ty<0){
+			ty=0;
+		}
 		sectors[level].draw(g,tx,ty);
 	}
 	public void change(int c){
@@ -80,18 +87,26 @@ public class World{
 	public Sector getSect(){
 		return sectors[level];
 	}
+	public int getX(){
+		return tx;
+	}
+	public int getY(){
+		return ty;
+	}
+	
 	public void setX(int a){
-		cx=a;
-//		if(tx<0){
-//			tx=0;
-//		}
+		cx+=a;
+		if(Math.abs(cx)>10){
+			cx-=a;
+		}
 	}
 	
 	public void setY(int a){
-		cy=a;
-//		if(ty<0){
-//			ty=0;
-//		}
+		cy+=a;
+		if(Math.abs(cy)>10){
+			cy-=a;
+		}
+		
 	}
 	
 //	public static void main(String args[]){

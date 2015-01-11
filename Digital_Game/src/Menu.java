@@ -1,23 +1,17 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.font.TextAttribute;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class Menu extends JPanel {
 	public JButton play, instructions, load, about, exit;
-	private JLabel header, bg; // images
-	private JPanel buttonsHolder, grid, blank;
+	private JPanel buttonsHolder, grid;
 	private GridBagConstraints gbc;
 
 	public Menu() {
