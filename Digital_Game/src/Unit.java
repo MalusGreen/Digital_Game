@@ -49,14 +49,14 @@ public class Unit {
 		x += dx;
 		y += dy;
 		// keep bug within frame
-		if (x > 780 - size)
-			x = 780 - size;
-		if (y > 680 - size)
-			y = 680 - size;
-		if (x < size)
-			x = size;
-		if (y < size)
-			y = size;
+//		if (x > 780 - size)
+//			x = 780 - size;
+//		if (y > 680 - size)
+//			y = 680 - size;
+//		if (x < size)
+//			x = size;
+//		if (y < size)
+//			y = size;
 	}
 
 	public void draw(Graphics g) {

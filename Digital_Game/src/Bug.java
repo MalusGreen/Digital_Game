@@ -95,7 +95,6 @@ public class Bug extends Unit {
 	}
 
 	public void update(World map) { // collision rect
-
 		for (Terrain i : map.getSect().getMap()) {
 			if (i.getSolid()
 					&& super.getCollision().intersects(i.getCollision())) {
@@ -118,23 +117,28 @@ public class Bug extends Unit {
 				if (!i.getSolid()
 						&& super.getCollision().intersects(i.getCollision())) {
 					int active = i.active();
+					
+					//ACTIVES RETURNED BY THE TERRAIN
+					//
+					//
+					//
+					//
+					//
 					switch (active) {
-					case 0:
+					case -1:
+						Game.data++;
+					case  0:
 						break;
-					case 1:
+					case  1:
 						// Check point captured. Show's the captured point.
 						break;
-					case 2:
+					case  2:
 						//Moves to a different level of Map.
 						map.change(1);
 						break;
-					case 3:
+					case  3:
 						map.change(-1);
 						break;
-					case 10:
-						if(!((Boundary)i).getCheckCol().intersects(super.getCollision())){
-							System.out.println("It works.");
-						}
 					}
 				}
 				super.update();

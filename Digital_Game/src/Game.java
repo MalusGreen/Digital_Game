@@ -4,30 +4,52 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import graphics.*;
 
 public class Game extends JPanel implements ActionListener, KeyListener,
 		MouseListener, MouseMotionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Timer timer;
+	
+	//Units and other interactables.
 	public static ArrayList<Bug> bugs = new ArrayList<>();
 	public static ArrayList<Unit> enemies = new ArrayList<>();
 	private ArrayList<Bug> selectedBugs = new ArrayList<>();
-	public static boolean left_clicked, right_clicked, shifted;
 	public static ArrayList<Bullet> bullets = new ArrayList<>();
 	public static ArrayList<Bullet> enemyBullets = new ArrayList<>();
+	
+	
+	//Interface
+	public static boolean left_clicked, right_clicked, shifted;
 	private int mx, my; //Movement
 	private Rectangle dragBox; //Selection
+	
+	
+	//Game
 	public static World map;
 	public static int score;
+	public static int data;
 	public static int click_count;
 	public JButton pause, exit, combine;
 	PointerInfo a = MouseInfo.getPointerInfo();
 	Point b = a.getLocation();
-
+	
+	//BackGround
+	public JPanel background_1, background_2;
+	public Pixel[] pixels;
+	public Pixel[] pixels_2;
+	
 	public Game() throws IOException {
+		data=0;
+		score=0;
 		click_count=0;
 		right_clicked=false;
 		left_clicked=false;
 		dragBox=new Rectangle();
+		
 		
 		addKeyListener(this);
 		addBugs();
@@ -36,6 +58,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		map = new World("test.txt");
 		setLayout(null);
 		
+		setBackground(50);
 		
 		combine = new PrettyBtn("COMBINE", 2);
 		pause = new PrettyBtn("PAUSE", 2);
@@ -71,7 +94,10 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
+		for(int i=0;i<pixels.length;i++){
+			pixels[i].draw(g, map.getX()/2, map.getY()/2);
+			pixels_2[i].draw(g, map.getX()/4, map.getY()/4);
+		}
 		//map
 		map.draw(g);
 		
@@ -81,6 +107,8 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		combine.setBounds(getWidth() - 190, getHeight() - 190, 170, 30);
 		pause.setBounds(getWidth() - 190, getHeight() - 130, 170, 30);
 		exit.setBounds(getWidth() - 190, getHeight() - 90, 170, 30);
+		
+		
 		Unit.setXY(map.getX(), map.getY());
 		
 		//Units
@@ -122,8 +150,11 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 	
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		//If mouse click is left, then gets the coordinates and draws a box based on click and drag.
 		if(SwingUtilities.isLeftMouseButton(e)){
 			if (e.getX() < 780){
+				
+				//The width and height of the box.
 				dragBox.width=(e.getX()+map.getX())-dragBox.x;
 				dragBox.height=(e.getY()+map.getY())-dragBox.y;
 			}
@@ -197,7 +228,6 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		System.out.println("yes");
 		if (e.getKeyCode() == 38) {// up arrow
 			Bug newSelected = null;
@@ -250,7 +280,6 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getKeyCode() == 16)// shift
 			shifted = false;
 		else if(e.getKeyCode() == KeyEvent.VK_W){
@@ -269,7 +298,6 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		if (e.getSource() == timer) {
 			if (right_clicked) {
 				int size = 0;
@@ -360,7 +388,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			return;
 		}
 		g.setColor(Color.blue);
-		g.fillOval(mx-click_count/2,my-click_count/2,click_count,click_count);
+		g.fillOval(mx-click_count/2-map.getX(),my-click_count/2-map.getY(),click_count,click_count);
 		click_count--;
 		
 	}
@@ -369,7 +397,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			return;
 		}
 		g.setColor(new Color(0,255,0,25));
-		g.fillRect(dragBox.x,dragBox.y,dragBox.width,dragBox.height);
+		g.fillRect(dragBox.x-map.getX(),dragBox.y-map.getY(),dragBox.width,dragBox.height);
 	}
 	public Rectangle normalize(Rectangle dragBox){
 		Rectangle rect=new Rectangle(dragBox);
@@ -397,6 +425,13 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		selectedBugs.add((Bug) bugs.get(0));
 		selectedBugs.get(0).selected = true;
 	}
-
-	
+	public void setBackground(int size){
+		pixels=new Pixel[size];
+		pixels_2=new Pixel[size];
+		for(int i=0;i<pixels.length;i++){
+			pixels[i]=new Pixel(Color.green,map.getSect().rect.width,map.getSect().rect.height);
+			pixels_2[i]=new Pixel(new Color(100,100,100),map.getSect().rect.width,map.getSect().rect.height);
+		}
+		
+	}
 }

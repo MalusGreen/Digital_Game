@@ -33,6 +33,6 @@ public class Boundary extends Terrain{
 		return new Rectangle(x,y,width,height);
 	}
 	public Rectangle getCheckCol(){
-		return new Rectangle(x+100,y+100,width-100, height-100);
+		return new Rectangle(x+100,y+100,width-200, height-200);
 	}
 }
