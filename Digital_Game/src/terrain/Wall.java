@@ -14,7 +14,7 @@ public class Wall extends Terrain {
 	@Override
 	public void draw(Graphics g, int x, int y) {
 		g.setColor(Color.red);
-
+		
 		g.fillRect(this.x-size-x, this.y-size-y, size*2, size*2);
 	}
 

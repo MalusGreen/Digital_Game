@@ -275,8 +275,16 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 				int size = 0;
 				int bug_size=0;
 				if (shifted) { // shift on, move all bugs
-					for (Unit i : bugs)
-						((Bug) i).moveTo(mx, my);
+					if(bugs.size()==1){
+						bugs.get(0).moveTo(mx,my);
+					}
+					else {
+						size=(int)Math.sqrt(bugs.size());
+						bug_size=bugs.get(0).size;
+						for (int i=0;i<bugs.size();i++){
+							bugs.get(i).moveTo(mx+i%size*bug_size*2-size*bug_size, my+i*bug_size*2/size-size*bug_size);
+						}
+					}
 				}else{
 					// shift off, only move selected bugs
 					
@@ -287,7 +295,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 						size=(int)Math.sqrt(selectedBugs.size());
 						bug_size=bugs.get(0).size;
 						for (int i=0;i<selectedBugs.size();i++){
-						selectedBugs.get(i).moveTo(mx+i%size*bug_size*2-size*bug_size, my+i*bug_size*2/size-size*bug_size);
+							selectedBugs.get(i).moveTo(mx+i%size*bug_size*2-size*bug_size, my+i*bug_size*2/size-size*bug_size);
 						}
 					}
 				}

@@ -6,7 +6,7 @@ import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
-import terrain.Terrain;
+import terrain.*;
 
 
 
@@ -122,17 +122,19 @@ public class Bug extends Unit {
 					case 0:
 						break;
 					case 1:
-						System.out.print("We did it, O:");
+						// Check point captured. Show's the captured point.
 						break;
 					case 2:
+						//Moves to a different level of Map.
 						map.change(1);
 						break;
 					case 3:
 						map.change(-1);
 						break;
-
-					// Check point captured. Show's the captured point.
-
+					case 10:
+						if(!((Boundary)i).getCheckCol().intersects(super.getCollision())){
+							System.out.println("It works.");
+						}
 					}
 				}
 				super.update();

@@ -40,12 +40,15 @@ public class World{
 		for(int i=0;i<sectors.length;i++){
 			sc.readLine();
 			data=sc.readLine();
+			System.out.println(data);
+			System.out.println("How can this be less than one?"+(data.indexOf("y")+1));
+			System.out.println("Or this?"+data.indexOf("sx"));
 			sectors[i]=new Sector(sc.readLine(),Integer.parseInt(data.substring(data.indexOf("x")+1,data.indexOf("y")))
 									,Integer.parseInt(data.substring(data.indexOf("y")+1,data.indexOf("sx")))
 									,Integer.parseInt(data.substring(data.indexOf("sx")+2,data.indexOf("sy")))
 									,Integer.parseInt(data.substring(data.indexOf("sy")+2)));
-			Terrain[] map=new Terrain[Integer.parseInt(sc.readLine())];
-			for(int u=0;u<map.length;u++){
+			Terrain[] map=new Terrain[1+Integer.parseInt(sc.readLine())];
+			for(int u=1;u<map.length;u++){
 				data=sc.readLine();
 				switch (data.charAt(0)){
 					case 'W':

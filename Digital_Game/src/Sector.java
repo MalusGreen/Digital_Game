@@ -2,7 +2,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import terrain.Terrain;
+import terrain.*;
 
 
 
@@ -28,6 +28,7 @@ public class Sector {
 	}
 	public void setMap(Terrain[] map){
 		this.map=map;
+		map[0]=new Boundary(0,0,rect.width,rect.height);
 	}
 	public Terrain[] getMap(){
 		return map;

@@ -8,10 +8,11 @@ public abstract class Terrain {
 	protected int y;
 	protected boolean solid;
 	protected String type;
-	protected int size=25;
+	protected int size;
 	public Terrain(int x,int y){
 		this.setX(x);
 		this.setY(y);
+		size=25;
 	}
 	public boolean getSolid(){
 		return solid;
