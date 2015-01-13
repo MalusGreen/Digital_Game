@@ -8,16 +8,10 @@ public class Bullet extends Unit {
 
 	// constructor
 	public Bullet(int x, int y, int time, int damage, String type) {
-		super(x, y);
-		super.size=size;
-		reached = true;
+		super(x, y, size);
 		this.damage = damage;
 		this.time = time;
 		this.type = type;
-	}
-	public Bullet(int x, int y, int time, int damage, String type,int speed){
-		this(x,y,time,damage,type);
-		super.speed=speed;
 	}
 
 	public void moveTo(int tx, int ty) {
@@ -56,7 +50,6 @@ public class Bullet extends Unit {
 	}
 
 	public void draw(Graphics g) {
-		g.setColor(new Color(0,0,0));
 		switch (damage) {
 		case 2:
 			g.setColor(Color.BLUE);
@@ -68,9 +61,9 @@ public class Bullet extends Unit {
 			g.setColor(Color.RED);
 			break;
 		}
-		g.drawRect(getCollision().x, getCollision().y, getCollision().width,
+		g.drawRect(getCollision().x - cx, getCollision().y - cy, getCollision().width,
 				getCollision().height);
-		g.fillRect(super.x - 5, super.y - 5, size * 2, size * 2);
+		g.fillRect(super.x - 5 - cx, super.y - 5 - cy, size * 2, size * 2);
 	}
 
 	public void setX(int x) {
@@ -83,11 +76,9 @@ public class Bullet extends Unit {
 
 	private void checkCollision() {
 		if (type.equals("bug")) {
-			System.out.println("size" + Game.enemies.size());
 			for (int i = 0; i < Game.enemies.size(); i++) {
 				Enemy curr = (Enemy) Game.enemies.get(i);
-				if (curr.getBound().intersects(getCollision())) {
-					System.out.println("intersect");
+				if (curr.getCollision().intersects(getCollision())) {
 					if (((Enemy) curr).health > 0) {
 						((Enemy) curr).health -= 1;
 					}
@@ -113,4 +104,5 @@ public class Bullet extends Unit {
 			}
 		}
 	}
+
 }

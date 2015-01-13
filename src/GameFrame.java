@@ -10,18 +10,52 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
+/* Bugs individually move.
+ * There is a non-grid based map and path-finder.
+ * Map is similar to: http://i.telegraph.co.uk/multimedia/archive/01512/The-Space-Game_1512822c.jpg
+ * Bugs extends Unit(){
+ * 		int x,y;
+ * 		int health;
+ * 		int damage;
+ * 		contains methods:
+ * 		private int[] findPath();
+ * 		public void moveTo(int[] pos);
+ * 		public void stop();
+ * }
+ * Modes extends Bugs(int num){
+ * 		num is number of bugs combined.
+ * }
+ * 
+ * Enemies extend Unit{
+ * 		int x,y;
+ * 		int health;
+ * 		int damage;
+ * 		private int[] findPath();
+ * 		public void moveTo(int[] pos);
+ * 		public void stop();
+ * }
+ * 
+ * Bugs move to locations and encounter enemies, they will attack them. With Melee attacks.
+ * Kind of like this: http://www.sc2blog.com/wp-content/uploads/2009/04/holding-ground.jpg
+ * The objective is to eliminate enemies on the map.
+ * If you select more than one bug you will be able to combine them into special bugs, allowing for range, 
+ * This will be important as enemies be more diverse. 
+ * Be careful though, you only have a certain number of bugs.
+ * 
+ */
 public class GameFrame extends JFrame implements ActionListener {
 
-	private static Container c;
-	private static CardLayout cards;
+	private Container c;
+	private CardLayout cards;
 	private Menu menu = new Menu();
 	private JButton play, pause, exit, menuExit, unpause, menubtn, menubtn2,
-			menubtn3,menubtn4, instructions, about;
-	private DefPanel pausePanel, instPanel, aboutPanel,gameOver;
-	private static Game game;
+			menubtn3, instructions, about;
+	private DefPanel pausePanel, instPanel, aboutPanel;
+	private Game game;
 
 	public GameFrame(String title) throws IOException {
 		super(title);
+		
 		c = this.getContentPane();
 		cards = new CardLayout();
 		c.setLayout(cards);
@@ -36,21 +70,16 @@ public class GameFrame extends JFrame implements ActionListener {
 		instPanel = new DefPanel("INSTRUCTIONS");
 		instPanel.addLabel(new JLabel(new ImageIcon("instructions.png")));
 		aboutPanel = new DefPanel("ABOUT");
-		aboutPanel
-				.addLabel("Source Code was created by Emma Xie and Kevin Zheng in ICS4U, 2014-15");
-		gameOver = new DefPanel("GAME OVER");
-		gameOver.addLabel("Check Points Conquered: ");
+		aboutPanel.addLabel("Source Code was created by Emma Xie and Kevin Zheng in ICS4U, 2014-15");
 		unpause = new PrettyBtn("UNPAUSE", 2);
 		instructions = menu.instructions;
 		menubtn = pausePanel.toMenu;
 		menubtn2 = instPanel.toMenu;
 		menubtn3 = aboutPanel.toMenu;
-		menubtn4=gameOver.toMenu;
 		pausePanel.addButton(unpause);
 		menubtn.addActionListener(this);
 		menubtn2.addActionListener(this);
 		menubtn3.addActionListener(this);
-		menubtn4.addActionListener(this);
 		instructions.addActionListener(this);
 		about.addActionListener(this);
 		unpause.addActionListener(this);
@@ -58,12 +87,22 @@ public class GameFrame extends JFrame implements ActionListener {
 		exit.addActionListener(this);
 		menuExit.addActionListener(this);
 		pause.addActionListener(this);
+		// menubtn.addKeyListener(game);
+		// menubtn2.addKeyListener(game);
+		// menubtn3.addKeyListener(game);
+		// instructions.addKeyListener(game);
+		// about.addActionListener(game);
+		// unpause.addKeyListener(game);
+		// play.addKeyListener(game);
+		// exit.addKeyListener(game);
+		// menuExit.addKeyListener(game);
+		// pause.addKeyListener(game);
+
 		c.add(menu, "Menu");
 		c.add(game, "Game Name");
 		c.add(pausePanel, "Paused");
 		c.add(instPanel, "Instructions");
 		c.add(aboutPanel, "About");
-		c.add(gameOver,"Game Over");
 		this.addKeyListener(game);
 	}
 
@@ -81,14 +120,9 @@ public class GameFrame extends JFrame implements ActionListener {
 			cards.show(c, "Game Name");
 			game.requestFocus();
 			game.getTimer().start();
-		} else if (e.getSource() == exit || e.getSource() == menubtn) {
+		} else if (e.getSource() == exit||e.getSource() == menubtn) {
 			cards.show(c, "Menu");
-			try {
-				game.reset();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			game.reset();
 		} else if (e.getSource() == instructions)
 			cards.show(c, "Instructions");
 		else if (e.getSource() == about)
@@ -100,21 +134,11 @@ public class GameFrame extends JFrame implements ActionListener {
 
 	}
 
-	public static void showGameOver() {
-		cards.show(c, "Game Over");
-		try {
-			game.reset();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
-
 	public static void main(String args[]) throws IOException {
 		GameFrame frame = new GameFrame("Source Code");
 		frame.setSize(1000, 700);
 		frame.setVisible(true);
-		frame.setResizable(true);
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 }

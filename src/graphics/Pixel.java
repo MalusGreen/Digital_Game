@@ -16,8 +16,8 @@ public class Pixel {
 		this.color=color;
 	}
 	public void draw(Graphics g,int cx,int cy){
+		System.out.println("Why not...");
 		g.setColor(color);
-		g.drawRect((int)x-cx*9/10-2, (int)y-cy*9/10-2, size, size);
 		g.fillRect((int)x-cx, (int)y-cy, size, size);
 		x-=Math.random()*speed/100;
 		y+=Math.random()*speed/100;
