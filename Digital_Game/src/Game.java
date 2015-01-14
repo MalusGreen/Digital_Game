@@ -99,11 +99,7 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		map.draw(g);
 
 		// side bar commands
-		Image sm = new ImageIcon("side-menu.png").getImage();
-		g.drawImage(sm, getWidth() - 220, 0, 220, getHeight(), null);
-		combine.setBounds(getWidth() - 190, getHeight() - 190, 170, 30);
-		pause.setBounds(getWidth() - 190, getHeight() - 130, 170, 30);
-		exit.setBounds(getWidth() - 190, getHeight() - 90, 170, 30);
+		
 		Unit.setXY(map.getX(), map.getY());
 
 		// units
@@ -138,6 +134,11 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		clicked(g);
 		// Shows the box the user creates with left mouse click.
 		dragBox(g);
+		Image sm = new ImageIcon("side-menu.png").getImage();
+		g.drawImage(sm, getWidth() - 220, 0, 220, getHeight(), null);
+		combine.setBounds(getWidth() - 190, getHeight() - 190, 170, 30);
+		pause.setBounds(getWidth() - 190, getHeight() - 130, 170, 30);
+		exit.setBounds(getWidth() - 190, getHeight() - 90, 170, 30);
 	}
 
 	@Override
@@ -304,67 +305,25 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 				System.out.println("Game Over");
 				GameFrame.showGameOver();
 			}
-			if (right_clicked) {
-				int size = 0;
-				int bug_size = 0;
-				if (shifted) { // shift on, move all bugs
-					if (bugs.size() == 1) {
-						bugs.get(0).moveTo(mx, my);
-					} else {
-						size = (int) Math.sqrt(bugs.size());
-						for (int i = 0; i < bugs.size(); i++) {
-							bugs.get(i).moveTo(
-									mx + i % size * Bug.size * 2 - size
-											* Bug.size,
-									my + i * Bug.size * 2 / size - size
-											* Bug.size);
-						}
-					}
-				} else {
-					// shift off, only move selected bugs
-
-					if (selectedBugs.size() == 1) {
-						selectedBugs.get(0).moveTo(mx, my);
-					} else {
-						size = (int) Math.sqrt(selectedBugs.size());
-						bug_size = bugs.get(0).size;
-						for (int i = 0; i < selectedBugs.size(); i++) {
-							selectedBugs.get(i).moveTo(
-									mx + i % size * bug_size * 2 - size
-											* bug_size,
-									my + i * bug_size * 2 / size - size
-											* bug_size);
-						}
-					}
+			if(map.isTele()!=0){
+				int[] a=map.getExit();
+				for(Unit i:bugs){
+					i.setX(a[0]);
+					i.setY(a[1]);
+					mx=a[0];
+					my=a[1];
+					shifted=true;
+					moveAll();
 				}
+			}
+			if (right_clicked) {
+				moveAll();
 			}
 			if (left_clicked) {
-				selectedBugs.clear();
-				Rectangle rect = normalize(dragBox);
-
-				for (Bug i : bugs) {
-					i.selected = false;
-					if (i.getCollision().intersects(rect)) {
-						selectedBugs.add(i);
-						i.selected = true;
-					}
-				}
+				selection();
 			}
 			if(space){
-				for(Unit i: enemies){
-					if(i.getCollision().intersects(new Rectangle(sx, sy, 1,1))){
-						for(Unit j: selectedBugs){
-							j.setAttack((Enemy)i);
-						}
-					}
-				}
-				for(Unit i: bugs){
-					if(i.getCollision().intersects(new Rectangle(sx, sy, 1,1))){
-						for(Unit j: selectedBugs){
-							j.setSupport((Bug)i);
-						}
-					}
-				}
+				actions();
 			}
 			for (int i = 0; i < bugs.size(); i++) {
 				((Bug) bugs.get(i)).update(map);
@@ -413,6 +372,71 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			}
 		}
 		repaint();
+	}
+	
+	public void actions(){
+		for(Unit i: enemies){
+			if(i.getCollision().intersects(new Rectangle(sx, sy, 1,1))){
+				for(Unit j: selectedBugs){
+					j.setAttack((Enemy)i);
+				}
+			}
+		}
+		for(Unit i: bugs){
+			if(i.getCollision().intersects(new Rectangle(sx, sy, 1,1))){
+				for(Unit j: selectedBugs){
+					j.setSupport((Bug)i);
+				}
+			}
+		}
+	}
+	
+	public void selection(){
+		selectedBugs.clear();
+		Rectangle rect = normalize(dragBox);
+
+		for (Bug i : bugs) {
+			i.selected = false;
+			if (i.getCollision().intersects(rect)) {
+				selectedBugs.add(i);
+				i.selected = true;
+			}
+		}
+	}
+	
+	public void moveAll(){
+		int size = 0;
+		int bug_size = 0;
+		if (shifted) { // shift on, move all bugs
+			if (bugs.size() == 1) {
+				bugs.get(0).moveTo(mx, my);
+			} else {
+				size = (int) Math.sqrt(bugs.size());
+				for (int i = 0; i < bugs.size(); i++) {
+					bugs.get(i).moveTo(
+							mx + i % size * Bug.size * 2 - size
+									* Bug.size,
+							my + i * Bug.size * 2 / size - size
+									* Bug.size);
+				}
+			}
+		} else {
+			// shift off, only move selected bugs
+
+			if (selectedBugs.size() == 1) {
+				selectedBugs.get(0).moveTo(mx, my);
+			} else {
+				size = (int) Math.sqrt(selectedBugs.size());
+				bug_size = bugs.get(0).size;
+				for (int i = 0; i < selectedBugs.size(); i++) {
+					selectedBugs.get(i).moveTo(
+							mx + i % size * bug_size * 2 - size
+									* bug_size,
+							my + i * bug_size * 2 / size - size
+									* bug_size);
+				}
+			}
+		}
 	}
 
 	public void clicked(Graphics g) {

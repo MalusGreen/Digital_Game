@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import terrain.Terrain;
+import terrain.*;
 
 public class Sector {
 	Rectangle rect;
@@ -70,5 +70,14 @@ public class Sector {
 	public int getNum() {
 		return num;
 	}
-
+	public Terrain getTele(int tele){
+		for(int i=0;i<map.size();i++){
+			if(map.get(i) instanceof Teleporter){
+				if(tele==((Teleporter)map.get(i)).getTo()){
+					return map.get(i);
+				}
+			}
+		}
+		return null;
+	}
 }

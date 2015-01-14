@@ -15,11 +15,13 @@ public class World {
 	private int level;
 	private int tx, ty;
 	private int cx, cy;
+	private int teleporting;
 	static Sector[] sectors;
 	final int[] A = { 0, -1, 1, 0 };
 	final int[] B = { -1, 0, 0, 1 };
 
 	public World() {
+		teleporting=0;
 		level = 0;
 		tx = 0;
 		ty = 0;
@@ -120,12 +122,19 @@ public class World {
 
 	public void change(int c) {
 		level += c;
+		teleporting=-c;
 	}
-
+	public int[] getExit(){
+		Terrain	tele=sectors[level].getTele(-teleporting);
+		teleporting=0;
+		return new int[]{tele.getX(), tele.getY()};
+	}
 	public Sector getSect() {
 		return sectors[level];
 	}
-
+	public int isTele(){
+		return teleporting;
+	}
 	public void setX(int a) {
 		cx += a;
 		if (Math.abs(cx) > 10) {

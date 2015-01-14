@@ -28,4 +28,12 @@ public class Teleporter extends Terrain{
 		}
 		return 0;
 	}
+	public int getTo(){
+		if(to==1){
+			return 1;
+		}
+		else{
+			return -1;
+		}
+	}
 }

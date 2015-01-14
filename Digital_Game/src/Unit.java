@@ -110,6 +110,14 @@ public class Unit {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public void setTX(int x){
+		tx=x;
+	}
+	
+	public void setTY(int y){
+		ty=y;
+	}
 
 	public static void setXY(int x, int y) {
 		cx = x;

@@ -3,27 +3,28 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Stroke;
 
 import javax.swing.ImageIcon;
 
-import terrain.*;
-
-
+import terrain.Terrain;
+import terrain.CheckPoint;
 
 public class Bug extends Unit {
 	private int type;
 	private Image timg;
-	static int SEPARATE_THRESHHOLD = 20;
 	public boolean selected;
 	public Bullet bullet;
 	protected int health;
 	public static int size = 25;
+	public final int MAXHEALTH = 80 + 20 * type;
 
 	public Bug(int x, int y) {
-		super(x, y, size);
+		super(x, y);
+		super.size = size;
 		type = 1;
 		updateImage();
-		health = 80 + 20 * type;
+		health = MAXHEALTH;
 	}
 
 	public int getType() {
@@ -40,15 +41,22 @@ public class Bug extends Unit {
 
 	public void draw(Graphics g) {
 		g.setColor(Color.RED);
-		g.drawImage(timg, x - size - cx, y - size - cy, size * 2, size * 2, null);
+		g.drawImage(timg, x - size - cx, y - size - cy, size * 2, size * 2,
+				null);
 		if (selected) {
 			g.setColor(new Color(240, 233, 34));
 			((Graphics2D) g).setStroke(new BasicStroke(3));
 			g.drawRect(x - size - cx, y - size - cy, size * 2, size * 2);
 		}
 		((Graphics2D) g).setStroke(new BasicStroke(1));
-		g.setColor(Color.GREEN);
-		g.fillRect(x - size - cx, y - size - cy, health / 2, 5);
+		if (health > MAXHEALTH / 2)
+			g.setColor(Color.GREEN);
+		else
+			g.setColor(Color.RED);
+		g.fillRect(x - size - cx, y - size - cy, health / 2, 5); // health bar
+		// g.drawRect(x - size - cx, y - size - cy, size * 2, size *
+		// 2);//collision box
+		super.draw(g);
 	}
 
 	public Image getImage() {
@@ -95,7 +103,8 @@ public class Bug extends Unit {
 	}
 
 	public void update(World map) { // collision rect
-		for (Terrain i : map.getSect().getMap()) {
+		for (Terrain i : map.getSect().getMap()) {// check collision with
+													// terrain
 			if (i.getSolid()
 					&& super.getCollision().intersects(i.getCollision())) {
 				if (Math.abs(tx - x) > Math.abs(ty - y)) {
@@ -111,8 +120,6 @@ public class Bug extends Unit {
 				}
 				tx = x;
 				ty = y;
-				System.out.println("box" + x + " " + y);
-				System.out.println(i.getX() + " " + i.getY());
 			} else {
 				if (!i.getSolid()
 						&& super.getCollision().intersects(i.getCollision())) {
@@ -125,8 +132,6 @@ public class Bug extends Unit {
 					//
 					//
 					switch (active) {
-					case -1:
-						Game.data++;
 					case  0:
 						break;
 					case  1:
@@ -139,31 +144,36 @@ public class Bug extends Unit {
 					case  3:
 						map.change(-1);
 						break;
+					case 100: // picked up resource for new bug
+						Game.bugs.add(new Bug(i.getX(), i.getY()));
+						map.getSect().getMap().remove(i);
+						break;
 					}
 				}
 				super.update();
 			}
 		}
+		
+		//Mechanics.
+		if(health>MAXHEALTH){
+			health=MAXHEALTH;
+		}
 	}
 
 	public void moveTo(int tx, int ty) {
+		attack=null;
+		support=null;
+		combat=false;
 		this.tx = tx;
 		this.ty = ty;
-	}
-
-	public void separate() {
-		for (Unit i : Game.bugs) {
-			if (i == this)
-				continue;
-			int distance = (int) Math.sqrt((Math.pow(this.x - i.x, 2) + Math
-					.pow(this.y - i.y, 2)));
-			if (distance < SEPARATE_THRESHHOLD) {
-
-			}
-		}
+		// this.tx += (int) (Math.random() * 50);
+		// this.tx -= (int) (Math.random() * 50);
+		// this.ty += (int) (Math.random() * 50);
+		// this.ty -= (int) (Math.random() * 50);
 	}
 
 	public void setHealth(int health) {
 		this.health = health;
 	}
+
 }
