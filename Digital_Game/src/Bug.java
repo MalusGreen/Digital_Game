@@ -159,6 +159,14 @@ public class Bug extends Unit {
 					}
 				}
 				super.update();
+				if (x > map.getSect().getRect().width - size)
+					x = map.getSect().getRect().width - size;
+				if (y > map.getSect().getRect().height - size)
+					y = map.getSect().getRect().height - size;
+				if (x < size)
+					x = size;
+				if (y < size)
+					y = size;
 			}
 		}
 		
