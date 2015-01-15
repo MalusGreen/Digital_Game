@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import terrain.CheckPoint;
-import terrain.Resource;
+import terrain.Data;
 import terrain.Teleporter;
 import terrain.Terrain;
 import terrain.Wall;
@@ -15,13 +15,11 @@ public class World {
 	private int level;
 	private int tx, ty;
 	private int cx, cy;
-	private int teleporting;
 	static Sector[] sectors;
 	final int[] A = { 0, -1, 1, 0 };
 	final int[] B = { -1, 0, 0, 1 };
 
 	public World() {
-		teleporting=0;
 		level = 0;
 		tx = 0;
 		ty = 0;
@@ -64,20 +62,22 @@ public class World {
 			Terrain[] map = new Terrain[Integer.parseInt(sc.readLine())];
 			for (int u = 0; u < map.length; u++) {
 				data = sc.readLine();
-				Terrain t =null;
+				Terrain t = null;
 				switch (data.charAt(0)) {
 				case 'W':
 					t = new Wall(
 							Integer.parseInt(data.substring(
 									data.indexOf("x") + 1, data.indexOf("y"))),
 							Integer.parseInt(data.substring(data.indexOf("y") + 1)));
-					
+
 					break;
-				case 'R':
-					t = new Resource(
+				case 'D':
+					t = new Data(
 							Integer.parseInt(data.substring(
 									data.indexOf("x") + 1, data.indexOf("y"))),
 							Integer.parseInt(data.substring(data.indexOf("y") + 1)));
+
+					break;
 				case 'C':
 					t = new CheckPoint(
 							Integer.parseInt(data.substring(
@@ -106,6 +106,22 @@ public class World {
 				m.add(j);
 			sectors[i].setMap(m);
 		}
+		BufferedReader br = new BufferedReader(new FileReader("enemies.txt"));
+		for (int i = 0; i < sectors.length; i++) {
+			int n = Integer.parseInt(br.readLine());
+			for (int j = 0; j < n; j++) {
+				String str = br.readLine();
+				String[] st = str.split(" ");
+				Enemy newE = new Enemy(Integer.parseInt(st[1]),
+						Integer.parseInt(st[2]), Integer.parseInt(st[0]),
+						st[3], Integer.parseInt(st[4]), Integer.parseInt(st[5]));
+				sectors[i].getEnemies().add(newE);
+
+			}
+			sectors[i].addEnemiesToGame();
+			br.readLine();
+		}
+
 	}
 
 	public void draw(Graphics g) {
@@ -122,19 +138,12 @@ public class World {
 
 	public void change(int c) {
 		level += c;
-		teleporting=-c;
 	}
-	public int[] getExit(){
-		Terrain	tele=sectors[level].getTele(-teleporting);
-		teleporting=0;
-		return new int[]{tele.getX(), tele.getY()};
-	}
+
 	public Sector getSect() {
 		return sectors[level];
 	}
-	public int isTele(){
-		return teleporting;
-	}
+
 	public void setX(int a) {
 		cx += a;
 		if (Math.abs(cx) > 10) {
@@ -156,6 +165,10 @@ public class World {
 
 	public int getY() {
 		return ty;
+	}
+
+	public int getLevel() {
+		return level;
 	}
 
 	// public static void main(String args[]){

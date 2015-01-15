@@ -16,8 +16,8 @@ public class GameFrame extends JFrame implements ActionListener {
 	private static CardLayout cards;
 	private Menu menu = new Menu();
 	private JButton play, pause, exit, menuExit, unpause, menubtn, menubtn2,
-			menubtn3,menubtn4, instructions, about;
-	private DefPanel pausePanel, instPanel, aboutPanel,gameOver;
+			menubtn3, menubtn4, instructions, about;
+	private DefPanel pausePanel, instPanel, aboutPanel, gameOver;
 	private static Game game;
 
 	public GameFrame(String title) throws IOException {
@@ -45,7 +45,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		menubtn = pausePanel.toMenu;
 		menubtn2 = instPanel.toMenu;
 		menubtn3 = aboutPanel.toMenu;
-		menubtn4=gameOver.toMenu;
+		menubtn4 = gameOver.toMenu;
 		pausePanel.addButton(unpause);
 		menubtn.addActionListener(this);
 		menubtn2.addActionListener(this);
@@ -63,7 +63,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		c.add(pausePanel, "Paused");
 		c.add(instPanel, "Instructions");
 		c.add(aboutPanel, "About");
-		c.add(gameOver,"Game Over");
+		c.add(gameOver, "Game Over");
 		this.addKeyListener(game);
 	}
 
@@ -102,6 +102,7 @@ public class GameFrame extends JFrame implements ActionListener {
 
 	public static void showGameOver() {
 		cards.show(c, "Game Over");
+		game.getTimer().stop();
 		try {
 			game.reset();
 		} catch (IOException e1) {
