@@ -16,7 +16,7 @@ public class GameFrame extends JFrame implements ActionListener {
 	private static CardLayout cards;
 	private Menu menu = new Menu();
 	private JButton play, pause, exit, menuExit, unpause, menubtn, menubtn2,
-			menubtn3, menubtn4, instructions, about;
+			menubtn3, menubtn4, instructions, about, load;
 	private DefPanel pausePanel, instPanel, aboutPanel, gameOver;
 	private static Game game;
 
@@ -27,6 +27,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		c.setLayout(cards);
 		game = new Game();
 		play = menu.play;
+		load = menu.load;
 		pause = game.pause;
 		exit = game.exit;
 		menuExit = menu.exit;
@@ -39,7 +40,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		aboutPanel
 				.addLabel("Source Code was created by Emma Xie and Kevin Zheng in ICS4U, 2014-15");
 		gameOver = new DefPanel("GAME OVER");
-		gameOver.addLabel("Check Points Conquered: ");
+		gameOver.addLabel("Check Points Conquered: "+ Game.score);
 		unpause = new PrettyBtn("UNPAUSE", 2);
 		instructions = menu.instructions;
 		menubtn = pausePanel.toMenu;
@@ -55,6 +56,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		about.addActionListener(this);
 		unpause.addActionListener(this);
 		play.addActionListener(this);
+		load.addActionListener(this);
 		exit.addActionListener(this);
 		menuExit.addActionListener(this);
 		pause.addActionListener(this);
@@ -89,7 +91,11 @@ public class GameFrame extends JFrame implements ActionListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-		} else if (e.getSource() == instructions)
+		}
+		else if(e.getSource() == load){
+			System.out.println("Stuff");
+		}
+		else if (e.getSource() == instructions)
 			cards.show(c, "Instructions");
 		else if (e.getSource() == about)
 			cards.show(c, "About");
