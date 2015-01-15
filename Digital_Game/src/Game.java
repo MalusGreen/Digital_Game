@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.swing.*;
 
 import graphics.*;
@@ -86,21 +87,37 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		for (int i = 0; i < 10; i++) {
 			bugs.add(new Bug(300 + i % size * Bug.size * 2 - size * Bug.size,
 					100 + i * Bug.size * 2 / size - size * Bug.size));
+			bugs.get(i).setType(1);
 		}
 
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		drawBG(g);
+		
+		map.draw(g);
+		Unit.setXY(map.getX(), map.getY());
+
+		
+		drawUnits(g);// units
+
+		/* -----------side menu ------------- */
+		drawMenu(g);//Draw the Menu
+		drawButtons(g);// draw invisible buttons to deselect bugs
+		miniMap(g);// minimap
+		drawBugIcons(g);// paint number of bugs, background, type,image for selected bugs
+		clicked(g);// Shows where user clicks.
+		dragBox(g);// Shows the box the user creates with left mouse click.
+	}
+	private void drawBG(Graphics g){
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i].draw(g, map.getX() / 2, map.getY() / 2);
 			pixels_2[i].draw(g, map.getX() / 4, map.getY() / 4);
 		}
-		map.draw(g);
+	}
 
-		Unit.setXY(map.getX(), map.getY());
-
-		// units
+	private void drawUnits(Graphics g) {
 		for (Bug i : bugs) {
 			i.draw(g);
 		}
@@ -113,31 +130,16 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		for (Enemy i : enemies.get(map.getLevel()))
 			i.draw(g);
 
-		// draw invisible buttons to deselect bugs
+	}
+
+	private void drawButtons(Graphics g) {
 		for (int i = 0; i < selectButtons.size(); i++) {
 			selectButtons.get(i).setBounds(getWidth() - 189 + i % 2 * 88,
 					getHeight() - 419 + i / 2 * 116, 75, 70);
 		}
+	}
 
-		/* -----------side menu ------------- */
-		Image sm = new ImageIcon("side-menu.png").getImage();
-		g.drawImage(sm, getWidth() - 220, 0, 220, getHeight(), null);
-		combine.setBounds(getWidth() - 190, getHeight() - 190, 170, 30);
-		pause.setBounds(getWidth() - 190, getHeight() - 130, 170, 30);
-		exit.setBounds(getWidth() - 190, getHeight() - 90, 170, 30);
-		g.setColor(Color.white);
-
-		// minimap
-		int l = map.getLevel();
-		if (l > 3) {
-			System.out.println(">");
-			l -= 4;
-			g.fillOval(getWidth() - 195 + l * 55, getHeight() - 646 + 35, 10,
-					10);
-		} else
-			g.fillOval(getWidth() - 195 + l * 55, getHeight() - 646, 10, 10);
-
-		// paint number of bugs, background, type,image for selected bugs
+	private void drawBugIcons(Graphics g) {
 		g.drawString(bugs.size() + "", getWidth() - 120, getHeight() - 565);
 		for (int i = 0; i < selectedBugs.size(); i++) {
 			g.fillRect(getWidth() - 189 + i % 2 * 88, getHeight() - 535 + i / 2
@@ -149,11 +151,26 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 					+ i % 2 * 88, getHeight() - 435 + i / 2 * 115);// type
 																	// string
 		}
+	}
 
-		// Shows where user clicks.
-		clicked(g);
-		// Shows the box the user creates with left mouse click.
-		dragBox(g);
+	private void miniMap(Graphics g) {
+		int l = map.getLevel();
+		if (l > 3) {
+			System.out.println(">");
+			l -= 4;
+			g.fillOval(getWidth() - 195 + l * 55, getHeight() - 646 + 35, 10,
+					10);
+		} else
+			g.fillOval(getWidth() - 195 + l * 55, getHeight() - 646, 10, 10);
+	}
+
+	public void drawMenu(Graphics g) {
+		Image sm = new ImageIcon("side-menu.png").getImage();
+		g.drawImage(sm, getWidth() - 220, 0, 220, getHeight(), null);
+		combine.setBounds(getWidth() - 190, getHeight() - 190, 170, 30);
+		pause.setBounds(getWidth() - 190, getHeight() - 130, 170, 30);
+		exit.setBounds(getWidth() - 190, getHeight() - 90, 170, 30);
+		g.setColor(Color.white);
 	}
 
 	@Override
@@ -352,10 +369,13 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 	}
 	
 	public void enemies_update(){
+		
 		for (int i = 0; i < enemies.get(map.getLevel()).size(); i++) {
 			Enemy curr = enemies.get(map.getLevel()).get(i);
-			curr.update();
-			curr.setAttack(null);
+			curr.update(map);
+			if(curr.attack!=null){
+				continue;
+			}
 			for (int j = 0; j < bugs.size(); j++) {
 				if (curr.getRange().intersects(bugs.get(j).getCollision())) {
 					curr.setAttack(bugs.get(j));
@@ -441,11 +461,27 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			if (i.getCollision()
 					.intersects(new Rectangle(sx, sy, 1, 1))) {
 				for (Unit j : selectedBugs) {
-					j.setSupport((Bug) i);
+					if(j.getRange().intersects(i.getCollision())){
+						j.setSupport((Bug) i);
+					}
 				}
 			}
 		}
 	}
+	
+	public void remove(){
+		for(Unit i:bugs){
+			if (i.health<=0){
+				bugs.remove(i);
+			}
+		}
+		for(Unit i: enemies.get(map.getLevel())){
+			if(i.health<=0){
+				enemies.get(map.getLevel()).remove(i);
+			}
+		}
+	}
+	
 	public void removeBug(int i){
 		if (i < selectedBugs.size()) {
 			Bug removeBug = selectedBugs.get(i);

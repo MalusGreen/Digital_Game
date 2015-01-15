@@ -5,6 +5,8 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 
+import terrain.Terrain;
+
 public class Unit {
 	protected int x, y; // position coordinates
 	protected int tx, ty; // target coordinates
@@ -17,12 +19,13 @@ public class Unit {
 	protected int type;
 	protected int damage;
 	protected int range;
+	protected int cooldown;
 
 	// Allows for interactions between units.
 	public Unit attack;
 	public Bug support;
 	public boolean alive;
-	public boolean combat;
+	public int combat;
 	protected int health;
 	protected int maxHealth;
 
@@ -32,14 +35,27 @@ public class Unit {
 		dx = 0;
 		dy = 0;
 		reached = false;
+		combat = 0;
 		tx = x;
 		ty = y;
+		cooldown=0;
 	}
 
-	public void update() {
-		// Interactions with other units.
-
-		// move bug
+	public void update(World map) {
+		if(combat>=0){
+			System.out.println(combat);
+			combat--;
+			return;
+		}
+		//Basic Movement.
+		moveUnit();
+		//Checks collision with Terrain
+		checkCollision(map);
+		//Checks collision with sector boundaries.
+		checkBoundaries(map);
+		
+	}
+	public void moveUnit(){
 		int differenceX = tx - x;
 		int differenceY = ty - y;
 		if (differenceX == 0 && differenceY == 0) {
@@ -60,22 +76,29 @@ public class Unit {
 			dx = 0;
 		if (dy == -5 || (dy >= 4.1 && dy <= 4.5))
 			dy = 0;
-
 		x += dx;
 		y += dy;
-		// keep bug within frame
-		if (cx == 0) {
-			if (x > 780 - size)
-				x = 780 - size;
-
-			if (x < size)
-				x = size;
+	}
+	
+	public void checkBoundaries(World map){
+		if(x>map.getSect().getRect().width){
+			x=map.getSect().getRect().width;
 		}
-		if (cy == 0) {
-			if (y > 680 - size)
-				y = 680 - size;
-			if (y < size)
-				y = size;
+		else if(x<0) {
+			x=0;
+		}
+		if(y>map.getSect().getRect().height){
+			y=map.getSect().getRect().height;
+		}
+		else if(y<0){
+			y=0;
+		}
+	}
+	
+	public void checkCollision(World map){
+		for (int i = 0; i < map.getSect().getMap().size(); i++) {
+			// check collision with terrain
+			
 		}
 	}
 
@@ -93,37 +116,55 @@ public class Unit {
 		}
 	}
 
-	public void attack(int identity) {
-		if (attack != null) {
-			combat = true;
-			attack.health -= damage;
-			if (attack.health <= 0) {
-				attack = null;
-				if (identity == 1) {// is a bug
-					Game.enemies.get(Game.map.getLevel()).remove(attack);
-				} else if (identity == 2)// is an enemy
-					Game.bugs.remove(attack);
-				combat = false;
+	public void combat() {
+		if(cooldown==0){
+			cooldown=10;
+			if (attack != null) {
+				attack.health -= damage;
+				attack.combat=100;
+				if (attack.health <= 0) {
+					attack = null;
+				}
+				
+			}
+			else if (support != null) {
+//				combat = true;
+				support.health++;
+				if (support.health <=0) {
+					support = null;
+				}
+				
+			}
+			return;
+		}
+		else if (attack!=null){
+			if(!getRange().intersects(attack.getCollision())){
+				attack=null;
 			}
 		}
-		if (support != null) {
-			combat = true;
-			support.health++;
-			if (support.health <=0) {
+		else if(support!=null){
+			if(!getRange().intersects(support.getCollision())){
 				support = null;
 			}
 		}
-		if (combat) {
-			return;
-		}
+		//Still need to understand where attack is made true or false;
+		//True, whenever something tries to damage it.
+		//False, when attacker dies, when out of range.
+		cooldown--;
 	}
 
 	public void setAttack(Unit opponent) {
 		attack = opponent;
+		if(attack!=null){
+			support=null;
+		}
 	}
 
 	public void setSupport(Bug ally) {
 		support = ally;
+		if(support!=null){
+			attack=null;
+		}
 	}
 
 	public void stop() {

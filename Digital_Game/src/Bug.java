@@ -29,6 +29,31 @@ public class Bug extends Unit {
 
 	public void setType(int type) { // types are added together for new type
 		this.type = type;
+		switch (type) {
+		case 1:
+			range = 150;
+			damage = 1;
+			break;
+		case 2:
+			range = 150;
+			damage = 2;
+			break;
+		case 3:
+			range = 600;
+			damage = 1;
+		case 4:
+			range = 400;
+			damage = 2;
+			break;
+		case 5:
+			range = 200;
+			damage = 15;
+			break;
+		case 6:
+			range = 400;
+			damage = 10;
+			break;
+		}
 	}
 
 	public void updateImage() {
@@ -55,6 +80,7 @@ public class Bug extends Unit {
 			g.setColor(Color.RED);
 		g.fillRect(x - size - cx, y - size - cy, (int) (health * one), 5); // health
 																			// bar
+		g.setColor(Color.GREEN);
 		g.drawOval(x - range - cx, y - range - cy, (int) (range * 2),
 				(int) (range * 2));
 		// g.drawRect(x - size - cx, y - size - cy, size * 2, size *
@@ -105,103 +131,65 @@ public class Bug extends Unit {
 		return health;
 	}
 
-	public void update(World map) { // collision rect
+	public void update(World map) {
 		if (health <= 0)
 			Game.bugs.remove(this);
-		for (int i = 0; i < map.getSect().getMap().size(); i++) {
-			// check collision with terrain
-			Terrain cur = map.getSect().getMap().get(i);
-			if (cur.getSolid()
-					&& super.getCollision().intersects(cur.getCollision())) {
-				if (Math.abs(tx - x) > Math.abs(ty - y)) {
-					if (x > cur.getX())
-						x = cur.getX() + cur.getSize() + 1 + size;
-					else if (x < cur.getX())
-						x = cur.getX() - cur.getSize() - 1 - size;
-				} else {
-					if (y > cur.getY())
-						y = cur.getY() + cur.getSize() + 1 + size;
-					else if (y < cur.getY())
-						y = cur.getY() - cur.getSize() - 1 - size;
-				}
-				tx = x;
-				ty = y;
-			} else {
-				if (!cur.getSolid()
-						&& super.getCollision().intersects(cur.getCollision())) {
-					int active = cur.active();
-
-					// ACTIVES RETURNED BY THE TERRAIN
-					//
-					//
-					//
-					//
-					//
-					switch (active) {
-					case -1:// gathered data, create new bug
-						map.getSect().getMap().remove(i);
-						i--;
-						Game.bugs
-								.add(new Bug(
-										Game.bugs.get(0).getX() + Bug.size,
-										Game.bugs.get(0).getY() + Bug.size));
-						break;
-					case 1:
-						// Check point captured. Show's the captured point.
-						break;
-					case 2:
-						// Moves to a different level of Map.
-						map.change(1);
-						break;
-					case 3:
-						map.change(-1);
-						break;
-					case 100: // picked up resource for new bug
-						Game.bugs.add(new Bug(cur.getX(), cur.getY()));
-						map.getSect().getMap().remove(i);
-						break;
-					}
-				}
-				super.update();
-				switch (type) {
-				case 1:
-					range = 150;
-					damage = 1;
-					break;
-				case 2:
-					range = 150;
-					damage = 2;
-					break;
-				case 3:
-					range = 600;
-					damage = 1;
-				case 4:
-					range = 400;
-					damage = 2;
-					break;
-				case 5:
-					range = 200;
-					damage = 15;
-					break;
-				case 6:
-					range = 400;
-					damage = 10;
-					break;
-				}
-				attack(1);
-			}
-		}
-
+		checkTerrain(map);
+		combat();
 		// Mechanics.
 		if (health > maxHealth) {
 			health = maxHealth;
 		}
 	}
 
+	public void checkTerrain(World map) {
+		for (int i = 0; i < map.getSect().getMap().size(); i++) {
+			// check collision with terrain
+			Terrain cur = map.getSect().getMap().get(i);
+			if (!cur.getSolid()
+					&& getCollision().intersects(cur.getCollision())) {
+				int active = cur.active();
+	
+				// ACTIVES RETURNED BY THE TERRAIN
+				//
+				//
+				//
+				//
+				//
+				switch (active) {
+				case -1:// gathered data, create new bug
+					map.getSect().getMap().remove(i);
+					i--;
+					Game.bugs
+							.add(new Bug(
+									Game.bugs.get(0).getX() + Bug.size,
+									Game.bugs.get(0).getY() + Bug.size));
+					break;
+				case 1:
+					// Check point captured. Show's the captured point.
+					break;
+				case 2:
+					// Moves to a different level of Map.
+					map.change(1);
+					break;
+				case 3:
+					map.change(-1);
+					break;
+				case 100: // picked up resource for new bug
+					Game.bugs.add(new Bug(cur.getX(), cur.getY()));
+					map.getSect().getMap().remove(i);
+					break;
+				}
+			}
+
+			super.update(map);
+		}
+	}
+
 	public void moveTo(int tx, int ty) {
 		attack = null;
 		support = null;
-		combat = false;
+//		combat = false;
 		this.tx = tx;
 		this.ty = ty;
 		// this.tx += (int) (Math.random() * 50);
@@ -213,5 +201,4 @@ public class Bug extends Unit {
 	public void setHealth(int health) {
 		this.health = health;
 	}
-
 }

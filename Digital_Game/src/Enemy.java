@@ -51,17 +51,16 @@ public class Enemy extends Unit {
 	// }
 	// }
 
-	public void update() {
+	public void update(World map) {
 		if (health <= 0)
 			Game.enemies.get(Game.map.getLevel()).remove(this);
 		if (attack != null) {
-			setDamage();
-			attack(2);
+			combat();
 		} else {
 			if (tx == x && ty == y) {
 				setMovement(-distance);
 			} else {
-				super.update();
+				super.update(map);
 			}
 		}
 
