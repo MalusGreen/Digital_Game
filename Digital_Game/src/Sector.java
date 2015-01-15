@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-import terrain.Terrain;
+import terrain.*;
 
 public class Sector {
 	Rectangle rect;
@@ -29,6 +29,21 @@ public class Sector {
 			map.get(i).draw(g, x, y);
 		}
 	}
+	
+	public Terrain getTele(int tele){
+		int t=tele;
+		if(tele==-1){
+			t=0;
+		}
+		for(int i=0;i<map.size();i++){
+			if(map.get(i) instanceof Teleporter){
+				if(t==((Teleporter)map.get(i)).getTo()){
+					return map.get(i);
+				}
+			}
+		}
+		return null;
+	}
 
 	public Rectangle getRect() {
 		return rect;
@@ -42,26 +57,6 @@ public class Sector {
 	public ArrayList<Terrain> getMap() {
 		return map;
 	}
-
-	// public void addEnemies() throws NumberFormatException, IOException {
-	// BufferedReader br = new BufferedReader(new FileReader("enemies.txt"));
-	// int n = Integer.parseInt(br.readLine());
-	// System.out.println(n);
-	// for (int i = 0; i < n; i++) {
-	// String str = br.readLine();
-	// System.out.println(str);
-	// String[] st = str.split(" ");
-	// Enemy newE = new Enemy(Integer.parseInt(st[1]),
-	// Integer.parseInt(st[2]), Integer.parseInt(st[0]), st[3],
-	// Integer.parseInt(st[4]), Integer.parseInt(st[5]));
-	// enemies.add(newE);
-	//
-	//
-	// }
-	// Game.enemies.add(enemies);
-	// System.out.println("index" + Game.enemies.indexOf(enemies));
-	// System.out.println("size" + enemies.size());
-	// }
 	public void addEnemiesToGame() {
 		Game.enemies.add(enemies);
 	}

@@ -15,11 +15,13 @@ public class World {
 	private int level;
 	private int tx, ty;
 	private int cx, cy;
+	private int teleporting;
 	static Sector[] sectors;
 	final int[] A = { 0, -1, 1, 0 };
 	final int[] B = { -1, 0, 0, 1 };
 
 	public World() {
+		teleporting=0;
 		level = 0;
 		tx = 0;
 		ty = 0;
@@ -32,6 +34,7 @@ public class World {
 	}
 
 	public World(String path) throws IOException {
+		teleporting=0;
 		level = 0;
 		tx = 0;
 		ty = 0;
@@ -107,8 +110,12 @@ public class World {
 			sectors[i].setMap(m);
 		}
 		BufferedReader br = new BufferedReader(new FileReader("enemies.txt"));
+		String d;
+		br.readLine();
 		for (int i = 0; i < sectors.length; i++) {
-			int n = Integer.parseInt(br.readLine());
+			d=br.readLine();
+			System.out.println(d);
+			int n = Integer.parseInt(d);
 			for (int j = 0; j < n; j++) {
 				String str = br.readLine();
 				String[] st = str.split(" ");
@@ -127,17 +134,38 @@ public class World {
 	public void draw(Graphics g) {
 		tx += cx;
 		ty += cy;
-		if (tx < 0) {
-			tx = 0;
+		if (tx < -50) {
+			tx = -50;
 		}
-		if (ty < 0) {
-			ty = 0;
+		else if(tx>sectors[level].getRect().width-690){
+			tx=sectors[level].getRect().width-690;
+			System.out.println(tx);
+		}
+		if (ty < -50) {
+			ty = -50;
+		}
+		else if(ty>sectors[level].getRect().height -600){
+			ty=sectors[level].getRect().height-600;
+			System.out.println(ty);
 		}
 		sectors[level].draw(g, tx, ty);
 	}
 
 	public void change(int c) {
-		level += c;
+ 		level += c;
+		teleporting=-c;
+	}
+	
+	public int[] getExit(){
+		Terrain	tele=sectors[level].getTele(-teleporting);
+		System.out.println(teleporting);
+		teleporting=0;
+		System.out.println(level);
+		return new int[]{tele.getX(), tele.getY()};
+ 	}
+	
+	public int isTele(){
+		return teleporting;
 	}
 
 	public Sector getSect() {
@@ -171,122 +199,4 @@ public class World {
 		return level;
 	}
 
-	// public static void main(String args[]){
-	// ArrayList<Vector> path=new ArrayList<Vector>();
-	// World test=new World();
-	// test.show(0,0);
-	// path=test.getPath(new Vector(sc.nextInt(),sc.nextInt()), new
-	// Vector(sc.nextInt(),sc.nextInt()));
-	// for(int i=0;i<path.size();i++){
-	// test.show(path.get(i).getX(),path.get(i).getY());
-	// System.out.println();
-	// }
-	// }
-	//
-	// public World(String path){
-	// BufferedReader in;
-	// try {
-	// in=new BufferedReader(new FileReader(path));
-	// in.read();
-	// } catch (FileNotFoundException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// }
-	//
-	// private void getMap(){
-	// map=new Terrain[my][mx];
-	// for(int i=0;i<my;i++){
-	// for(int j=0;j<mx;j++){
-	// switch(data.charAt((i)*mx+(j))){
-	// case ' ':
-	// map[i][j]=new Wall();
-	// break;
-	// case 'O':
-	// map[i][j]=new Path();
-	// break;
-	// }
-	// }
-	// }
-	// }
-	// //a is start, b is destination
-	// public ArrayList<Vector> getPath(Vector a, Vector b){
-	// Hashtable<Integer, Integer> visited= new Hashtable<Integer, Integer>();
-	// ArrayList<Vector> path=new ArrayList<Vector>();
-	// ArrayList<Vector> out=new ArrayList<Vector>();
-	// path.add(a);
-	// path: {
-	// for(int i=0;i<path.size();i++){
-	// for(int j=0;j<4;j++){
-	// //checks each co-ordinate next to current co-ord we are checking. If in
-	// map adds to the path.
-	// //The visited hashtable remembers where each point came from.
-	// if(checkCoord(path.get(i).getX()+A[j], path.get(i).getY()+B[j])){
-	// if(!path.contains(new Vector(path.get(i).getX()+A[j],
-	// path.get(i).getY()+B[j]))){
-	//
-	// //If the co-ord is inmap and not already in path. Remember where it came
-	// from, add it to path.
-	// visited.put(path.size(), i);
-	// path.add(new Vector(path.get(i).getX()+A[j], path.get(i).getY()+B[j]));
-	//
-	// //If the co-ord is equal to the destination b, then break loop.
-	// if(path.get(path.size()-1).equals(b)){
-	// break path;
-	// }
-	// }
-	// }
-	// }
-	// }
-	// return out;
-	// }
-	// int count=path.size()-1;
-	// do{
-	// out.add(path.get(count));
-	// count=visited.get(count);
-	// }while(count!=0);
-	//
-	// return out;
-	// // ArrayList<ArrayList<Vector>> paths=new ArrayList<ArrayList<Vector>>();
-	// //
-	// // if(){
-	// // if(a.equals(b)){
-	// //
-	// // }
-	// // }
-	// }
-	//
-	// public Terrain getMap(int x, int y){
-	// return map[y][x];
-	// }
-	//
-	// public boolean checkCoord(int x, int y){
-	// if(x<mx&&x>-1&&y<my&&y>-1){
-	//
-	// return !map[y][x].getSolid();
-	// }
-	// return false;
-	// }
-	//
-	// public void show(int x, int y){
-	// for(int i=0;i<my;i++){
-	// for(int j=0;j<mx;j++){
-	// if(i==y&&j==x){
-	// System.out.print("+ ");
-	// }
-	// else{
-	// if(map[i][j] instanceof Wall){
-	// System.out.print("O ");
-	// }
-	// else{
-	// System.out.print("  ");
-	// }
-	// }
-	// }
-	// System.out.println();
-	// }
-	// }
 }

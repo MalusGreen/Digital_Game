@@ -84,22 +84,18 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 
 	public void addBugs(ArrayList<Bug> arr) {
 		int size = (int) Math.sqrt(10);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 1; i++) {
 			bugs.add(new Bug(300 + i % size * Bug.size * 2 - size * Bug.size,
 					100 + i * Bug.size * 2 / size - size * Bug.size));
 			bugs.get(i).setType(1);
 		}
-
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		drawBG(g);
-		
 		map.draw(g);
 		Unit.setXY(map.getX(), map.getY());
-
-		
 		drawUnits(g);// units
 
 		/* -----------side menu ------------- */
@@ -336,6 +332,9 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 			if (space) {
 				space();
 			}
+			
+			tele();
+			
 			for (int i = 0; i < bugs.size(); i++) {
 				bugs.get(i).update(map);
 			}
@@ -367,7 +366,18 @@ public class Game extends JPanel implements ActionListener, KeyListener,
 		}
 		repaint();
 	}
-	
+	public void tele(){
+		if(map.isTele()!=0){
+			int[] a=map.getExit();
+			for(Unit i:bugs){
+					i.setX(a[0]);
+					i.setY(a[1]);
+					mx=a[0];
+					my=a[1];
+					shifted=true;
+		 	}
+		}
+	}
 	public void enemies_update(){
 		
 		for (int i = 0; i < enemies.get(map.getLevel()).size(); i++) {

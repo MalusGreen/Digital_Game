@@ -34,4 +34,8 @@ public class Teleporter extends Terrain {
 		}
 		return 0;
 	}
+	
+	public int getTo(){
+		return to;
+	}
 }

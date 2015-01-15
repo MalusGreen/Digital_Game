@@ -2,24 +2,28 @@
 --------------------
 Sector 1: x1y2sx1000sy1000
 outer-space.jpg
-7
+9
 W: x100y200
+C: x400y400
 C: x500y500
 W: x500y600
-T: x300y550
+T: x600y200
+W: x300y550
 W: x150y200
 W: x220y230
 D: x400y400
 --------------------
-Sector 2: x5y6sx7sy8
+Sector 2: x1y2sx1000sy1000
 nasa-space.jpg
-3
+4
 W: x150y500
 C: x10y10
 T: x500y500
+t: x600y300
 --------------------
-Sector 3: x1y2sx3sy4
+Sector 3: x1y2sx1000sy1000
 Orange-space.jpg
-2
-W: x100y100
-t: x500y500
+3
+t: x300y210
+C: x500y500
+W: x109y400
